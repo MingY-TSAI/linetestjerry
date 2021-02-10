@@ -4,7 +4,7 @@ import urllib.parse
 import datetime
 
 # Authentication Database認證資料庫
-Authdb='stockdb'
+Authdb='stockdb-abcd1234'
 
 ##### 資料庫連接 #####
 def constructor():
