@@ -5,13 +5,14 @@ Created on Sat Aug 18 01:00:17 2018
 @author: linzino
 """
 
-
+#載入LineBot所需要的套件
 from flask import Flask, request, abort
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import mongodb
 import re
+
 
 app = Flask(__name__)
 
@@ -39,6 +40,7 @@ def callback():
         abort(400)
     return 'OK'
 
+
 #訊息傳遞區塊
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -58,5 +60,11 @@ def handle_message(event):
         return 0
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+#主程式
+import os
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port,debug=True)
