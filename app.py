@@ -97,24 +97,24 @@ def handle_message(event):
 #     uid = profile.user_id #使用者ID
     uid = event.source.user_id
     usespeak=str(event.message.text) #使用者講的話
-    line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak))#測試回復
+    line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#測試回復
     
-    if re.match('[0-9]{4}[<>][0-9]',usespeak): # 先判斷是否是使用者要用來存股票的
-        mongodb.write_user_stock_fountion(stock=usespeak[0:4], bs=usespeak[4:5], price=usespeak[5:])
-        line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
-        return 0
+#     if re.match('[0-9]{4}[<>][0-9]',usespeak): # 先判斷是否是使用者要用來存股票的
+#         mongodb.write_user_stock_fountion(stock=usespeak[0:4], bs=usespeak[4:5], price=usespeak[5:])
+#         line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+#         return 0
 
     
-    elif re.match('刪除[0-9]{4}',usespeak): # 刪除存在資料庫裡面的股票
-        mongodb.delete_user_stock_fountion(stock=usespeak[2:])
-        line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
-        return 0
-    else:
-        line_bot_api.reply_message(event.reply_token,TextSendMessage('輸入錯誤'))
+#     elif re.match('刪除[0-9]{4}',usespeak): # 刪除存在資料庫裡面的股票
+#         mongodb.delete_user_stock_fountion(stock=usespeak[2:])
+#         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
+#         return 0
+#     else:
+#         line_bot_api.reply_message(event.reply_token,TextSendMessage('輸入錯誤'))
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
 
 # #主程式
 # import os
