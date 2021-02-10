@@ -7,7 +7,7 @@ import datetime
 ###############################################################################
 
 # Authentication Database認證資料庫
-Authdb='資料庫名稱'
+Authdb='stockdb'
 
 ##### 資料庫連接 #####
 def constructor():
