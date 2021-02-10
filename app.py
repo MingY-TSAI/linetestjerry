@@ -4,60 +4,13 @@ Created on Sat Aug 18 01:00:17 2018
 
 @author: linzino
 """
-from pymongo import MongoClient
-import urllib.parse
-import datetime
-
-# Authentication Database認證資料庫
-Authdb='stockdb-abcd1234'
-
-
-client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-db = client[Authdb]
-
-##### 資料庫連接 #####
-def constructor():
-    #client = MongoClient('你的連接指令')
-    client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-    db = client[Authdb]
-    return db
-   
-#----------------------------儲存使用者的股票--------------------------
-def write_user_stock_fountion(stock, bs, price):  
-    db=constructor()
-    collect = db['mystock']
-    collect.insert({"stock": stock,
-                    "data": 'care_stock',
-                    "bs": bs,
-                    "price": float(price),
-                    "date_info": datetime.datetime.utcnow()
-                    })
-    
-#----------------------------殺掉使用者的股票--------------------------
-def delete_user_stock_fountion(stock):  
-    db=constructor()
-    collect = db['mystock']
-    collect.remove({"stock": stock})
-    
-#----------------------------秀出使用者的股票--------------------------
-def show_user_stock_fountion():  
-    db=constructor()
-    collect = db['mystock']
-    cel=list(collect.find({"data": 'care_stock'}))
-
-    return cel
-
-
-
-
-
 
 #載入LineBot所需要的套件
 from flask import Flask, request, abort
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
-# import mongodb
+import mongodb
 import re
 
 
@@ -93,9 +46,9 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     ### 抓到顧客的資料 ###
-#     profile = line_bot_api.get_profile(event.source.user_id)
-#     uid = profile.user_id #使用者ID
-    uid = event.source.user_id
+    profile = line_bot_api.get_profile(event.source.user_id)
+    uid = profile.user_id #使用者ID
+#     uid = event.source.user_id
     usespeak=str(event.message.text) #使用者講的話
     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#測試回復
     
