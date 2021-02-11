@@ -57,10 +57,10 @@ def handle_message(event):
     db.authenticate(name="Jerry",password='abcd1234')
     db = client.stockdb    #Select the database
     collect = db['mystock']
-    collect.insert({"stock": '2330',
+    collect.insert({"stock": stock,
                     "data": 'care_stock',
-                    "bs": '>',
-                    "price": float(1),
+                    "bs": bs,
+                    "price": float(price),
                     "date_info": datetime.datetime.utcnow()
                    })
 ##------------------鏡像回復------------------------------------
