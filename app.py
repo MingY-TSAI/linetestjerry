@@ -7,6 +7,9 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 # import mongodb
 import re
+from pymongo import MongoClient
+import urllib.parse
+import datetime
 
 
 app = Flask(__name__)
@@ -52,7 +55,7 @@ def handle_message(event):
         bs=usespeak[4:5] 
         price=usespeak[5:]
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client[Authdb]
+        db = client['stockdb-abcd1234']
         collect = db['mystock']
         collect.insert({"stock": stock,
                         "data": 'care_stock',
@@ -67,7 +70,7 @@ def handle_message(event):
     elif re.match('刪除[0-9]{4}',usespeak): # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client[Authdb]    
+        db = client['stockdb-abcd1234']   
         collect = db['mystock']
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
