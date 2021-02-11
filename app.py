@@ -1,10 +1,47 @@
+from pymongo import MongoClient
+import urllib.parse
+import datetime
 
+# Authentication Database認證資料庫
+Authdb='stockdb-abcd1234'
+
+##### 資料庫連接 #####
+def constructor():
+    #client = MongoClient('你的連接指令')
+    client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
+    db = client[Authdb]
+    return db
+   
+#----------------------------儲存使用者的股票--------------------------
+def write_user_stock_fountion(stock, bs, price):  
+    db=constructor()
+    collect = db['mystock']
+    collect.insert({"stock": stock,
+                    "data": 'care_stock',
+                    "bs": bs,
+                    "price": float(price),
+                    "date_info": datetime.datetime.utcnow()
+                    })
+    
+#----------------------------殺掉使用者的股票--------------------------
+def delete_user_stock_fountion(stock):  
+    db=constructor()
+    collect = db['mystock']
+    collect.remove({"stock": stock})
+    
+#----------------------------秀出使用者的股票--------------------------
+def show_user_stock_fountion():  
+    db=constructor()
+    collect = db['mystock']
+    cel=list(collect.find({"data": 'care_stock'}))
+
+    return cel
 
 from flask import Flask, request, abort
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
-import mongodb
+# import mongodb
 import re
 
 app = Flask(__name__)
@@ -41,20 +78,20 @@ def handle_message(event):
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None: # 先判斷是否是使用者要用來存股票的
-        mongodb.write_user_stock_fountion(stock=usespeak[0:4], bs=usespeak[4:5], price=usespeak[5:])
+        write_user_stock_fountion(stock=usespeak[0:4], bs=usespeak[4:5], price=usespeak[5:])
         line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
 
     
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
-        mongodb.delete_user_stock_fountion(stock=usespeak[2:])
+        delete_user_stock_fountion(stock=usespeak[2:])
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     
     else:
-        line_bot_api.push_message(uid, TextSendMessage('輸入錯誤代碼'))
+        line_bot_api.push_message(uid, TextSendMessage('輸入代碼錯誤'))
         return 0
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=F)
