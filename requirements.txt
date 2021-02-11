@@ -1,11 +1,4 @@
+gunicorn
 Flask
 line-bot-sdk
 pymongo
-bs4
-flask
-datetime
-pandas
-SnowNLP
-emoji
-pyshorteners
-scipy
