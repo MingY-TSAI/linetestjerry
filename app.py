@@ -49,9 +49,9 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-    message = TextSendMessage(text=event.message.text)
+#     message = TextSendMessage(text=event.message.text)
 #     line_bot_api.reply_message(event.reply_token,message)
-    line_bot_api.reply_message(event.reply_token,str(uid)+usespeak)#測試回復  
+    line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#測試回復  
 
 
 # #訊息傳遞區塊
