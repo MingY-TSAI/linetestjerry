@@ -50,7 +50,7 @@ def handle_message(event):
 #     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#測試回復
 
                               
-    if re.match('[0-9]{4}[<>][0-9]',usespeak): # 先判斷是否是使用者要用來存股票的
+    if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None: # 先判斷是否是使用者要用來存股票
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
         price=usespeak[5:]
@@ -67,7 +67,7 @@ def handle_message(event):
         return 0
 
   
-    elif re.match('刪除[0-9]{4}',usespeak): # 刪除存在資料庫裡面的股票
+    elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb-abcd1234']   
