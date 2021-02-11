@@ -50,34 +50,22 @@ def handle_message(event):
 #     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#測試回復
 
                               
-    if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None: # 先判斷是否是使用者要用來存股票
-        stock=usespeak[0:4] 
-        bs=usespeak[4:5] 
-        price=usespeak[5:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb-abcd1234']
-        collect = db['mystock']
-        collect.insert({"stock": stock,
-                        "data": 'care_stock',
-                        "bs": bs,
-                        "price": float(price),
-                        "date_info": datetime.datetime.utcnow()
-                       })
-        line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
-        return 0
+    stock=usespeak[0:4] 
+    bs=usespeak[4:5] 
+    price=usespeak[5:]
+    client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
+    db = client['stockdb-abcd1234']
+    collect = db['mystock']
+    collect.insert({"stock": stock,
+                    "data": 'care_stock',
+                    "bs": bs,
+                    "price": float(price),
+                    "date_info": datetime.datetime.utcnow()
+                   })
+     line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+     return 0
 
-  
-    elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
-        stock=usespeak[2:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb-abcd1234']   
-        collect = db['mystock']
-        collect.remove({"stock": stock})            
-        line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
-        return 0
-    else:
-        line_bot_api.push_message(uid, TextSendMessage('輸入錯誤'))
-        return 0
+
 
 # if __name__ == '__main__':
 #     app.run(debug=False)
