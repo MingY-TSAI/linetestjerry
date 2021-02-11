@@ -49,26 +49,40 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
+    stock=usespeak[0:4] 
+    bs=usespeak[4:5] 
+    price=usespeak[5:]
+    client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+#         client = MongoClient("mongodb://127.0.0.1:10250/?ssl=true") #host uri
+    db.authenticate(name="Jerry",password='abcd1234')
+    db = client.stockdb    #Select the database
+    collect = db['mystock']
+    collect.insert({"stock": stock,
+                    "data": 'care_stock',
+                    "bs": bs,
+                    "price": float(price),
+                    "date_info": datetime.datetime.utcnow()
+                   })
 ##------------------鏡像回復------------------------------------
 #     message = TextSendMessage(text=event.message.text)
 #     line_bot_api.reply_message(event.reply_token,message)
 #--------------------------------------------------------------
 #     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#抓取id測試回復  
-    if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
-        stock=usespeak[0:4] 
-        bs=usespeak[4:5] 
-        price=usespeak[5:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-#         client = MongoClient("mongodb://127.0.0.1:10250/?ssl=true") #host uri
-        db = client.stockdb    #Select the database
-        collect = db['mystock']
-        collect.insert({"stock": stock,
-                        "data": 'care_stock',
-                        "bs": bs,
-                        "price": float(price),
-                        "date_info": datetime.datetime.utcnow()
-                       })
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+#     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
+#         stock=usespeak[0:4] 
+#         bs=usespeak[4:5] 
+#         price=usespeak[5:]
+#         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+# #         client = MongoClient("mongodb://127.0.0.1:10250/?ssl=true") #host uri
+#         db = client.stockdb    #Select the database
+#         collect = db['mystock']
+#         collect.insert({"stock": stock,
+#                         "data": 'care_stock',
+#                         "bs": bs,
+#                         "price": float(price),
+#                         "date_info": datetime.datetime.utcnow()
+#                        })
+#         line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
 # #訊息傳遞區塊
 # @handler.add(MessageEvent, message=TextMessage)
 # def handle_message(event):
