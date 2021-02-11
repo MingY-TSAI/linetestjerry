@@ -43,20 +43,25 @@ def callback():
 
     return 'OK'
 
-# #訊息傳遞區塊
-# @handler.add(MessageEvent, message=TextMessage)
-# def handle_message(event):
-#     message = TextSendMessage(text=event.message.text)
-#     line_bot_api.reply_message(event.reply_token,message)
-
 #訊息傳遞區塊
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    ### 抓到顧客的資料 ###
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-    line_bot_api.reply_message(event.reply_token,str(uid)+usespeak)#測試回復    
+    message = TextSendMessage(text=event.message.text)
+#     line_bot_api.reply_message(event.reply_token,message)
+    line_bot_api.reply_message(event.reply_token,str(uid)+usespeak)#測試回復  
+
+
+# #訊息傳遞區塊
+# @handler.add(MessageEvent, message=TextMessage)
+# def handle_message(event):
+#     ### 抓到顧客的資料 ###
+#     profile = line_bot_api.get_profile(event.source.user_id)
+#     uid = profile.user_id #使用者ID
+#     usespeak=str(event.message.text) #使用者講的話
+#     line_bot_api.reply_message(event.reply_token,str(uid)+usespeak)#測試回復    
 #     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:# 先判斷是否是使用者要用來存股票的
 #         stock=usespeak[0:4] 
 #         bs=usespeak[4:5] 
