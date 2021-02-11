@@ -60,7 +60,7 @@ def handle_message(event):
                         "price": float(price),
                         "date_info": datetime.datetime.utcnow()
                        })
-        line_bot_api.reply_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+        line_bot_api.push_message(uid, TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
 
   
@@ -73,14 +73,14 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     else:
-        line_bot_api.reply_message(event.reply_token,TextSendMessage('輸入錯誤'))
+        line_bot_api.push_message(uid, TextSendMessage('輸入錯誤'))
         return 0
 
-if __name__ == '__main__':
-    app.run(debug=False)
+# if __name__ == '__main__':
+#     app.run(debug=False)
 
-# #主程式
-# import os
-# if __name__ == "__main__":
-#     port = int(os.environ.get('PORT', 5000))
-#     app.run(host='0.0.0.0', port=port,debug=False)
+#主程式
+import os
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port,debug=False)
