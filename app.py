@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug 18 01:00:17 2018
-
-@author: linzino
-"""
 
 
 from flask import Flask, request, abort
@@ -55,6 +49,10 @@ def handle_message(event):
     elif re.match('刪除[0-9]{4}',usespeak)is not None: # 刪除存在資料庫裡面的股票
         mongodb.delete_user_stock_fountion(stock=usespeak[2:])
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
+        return 0
+    
+    else:
+        line_bot_api.push_message(uid, TextSendMessage('輸入錯誤代碼'))
         return 0
 
 
