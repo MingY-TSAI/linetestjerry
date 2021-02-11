@@ -58,7 +58,8 @@ def handle_message(event):
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
         price=usespeak[5:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
+#         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
+        client = MongoClient("mongodb+srv://Jerry::abcd1234@cluster0.z7sx8.mongodb.net/test")
         db = client['stockdb-abcd1234']
         collect = db['mystock']
         collect.insert({"stock": stock,
