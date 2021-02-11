@@ -49,18 +49,18 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-    stock=usespeak[0:4] 
-    bs=usespeak[4:5] 
-    price=usespeak[5:]
+#     stock=usespeak[0:4] 
+#     bs=usespeak[4:5] 
+#     price=usespeak[5:]
     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
 #         client = MongoClient("mongodb://127.0.0.1:10250/?ssl=true") #host uri
     db.authenticate(name="Jerry",password='abcd1234')
     db = client.stockdb    #Select the database
     collect = db['mystock']
-    collect.insert({"stock": stock,
+    collect.insert({"stock": '2330',
                     "data": 'care_stock',
-                    "bs": bs,
-                    "price": float(price),
+                    "bs": '>',
+                    "price": float(1),
                     "date_info": datetime.datetime.utcnow()
                    })
 ##------------------鏡像回復------------------------------------
