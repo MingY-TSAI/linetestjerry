@@ -16,10 +16,10 @@ import re
 from pymongo import MongoClient
 import urllib.parse
 import datetime
-import urllib.parse
-import datetime
 import requests
 from bs4 import BeautifulSoup
+
+
 app = Flask(__name__)
 
 
@@ -82,17 +82,17 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-    elif re.match('查詢存股',usespeak) is not None:
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
-        cel=list(collect.find())
-        stock_str=''
-        for stock in cel:
-            print(stock['stock'])
-            stock_str+=x['stock']
-        line_bot_api.push_message(uid, TextSendMessage(stock_str)
-        return 0
+#     elif re.match('查詢存股',usespeak) is not None:
+#         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+#         db = client['stockdb']    
+#         collect = db['mystock']
+#         cel=list(collect.find())
+#         stock_str=''
+#         for stock in cel:
+#             print(stock['stock'])
+#             stock_str+=x['stock']
+#         line_bot_api.push_message(uid, TextSendMessage(stock_str)
+#         return 0
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
