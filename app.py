@@ -69,6 +69,7 @@ def handle_message(event):
                         "date_info": datetime.datetime.utcnow()
                        })
         line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+        return 0
 # #訊息傳遞區塊
 # @handler.add(MessageEvent, message=TextMessage)
 # def handle_message(event):
