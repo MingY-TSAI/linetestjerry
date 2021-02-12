@@ -83,7 +83,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-    
+############################################查詢仍失敗##################################################
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
@@ -91,7 +91,7 @@ def handle_message(event):
         cel=list(collect.find())
         stock_str=''
         for stock in cel:
-            stock_str+=x['stock']
+            stock_str+=stock['stock']
         line_bot_api.reply_message(event.reply_token,stock_str)
         return 0
                                   
