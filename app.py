@@ -1,5 +1,6 @@
 ##V9成功部屬
 #載入LineBot所需要的套件
+from __future__ import print_function
 from flask import Flask, request, abort
 
 from linebot import (
@@ -15,7 +16,10 @@ import re
 from pymongo import MongoClient
 import urllib.parse
 import datetime
-
+import urllib.parse
+import datetime
+import requests
+from bs4 import BeautifulSoup
 app = Flask(__name__)
 
 
@@ -78,11 +82,54 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
+    elif re.match('查詢存股',usespeak) is not None:
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']    
+        collect = db['mystock']
+        cel=list(collect.find())
+        stock_str=''
+        for stock in cel:
+            print(stock['stock'])
+            stock_str+=x['stock']
+        line_bot_api.push_message(uid, TextSendMessage(stock_str)
+        return 0
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
-    
-    
+# def show_user_stock_fountion():  
+#     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+#     db = client['stockdb']    
+#     collect = db['mystock']
+#     cel=list(collect.find({"data": 'care_stock'}))
+#     return cel
+# def job():
+#     data = show_user_stock_fountion()
+#     for i in data:
+#         stock=i['stock']
+#         bs=i['bs']
+#         price=i['price']
+        
+#         url = 'https://tw.stock.yahoo.com/q/q?s=' + stock 
+#         list_req = requests.get(url)
+#         soup = BeautifulSoup(list_req.content, "html.parser")
+#         getstock= soup.find('b').text #裡面所有文字內容
+#         if float(getstock):
+#             if bs == '<':
+#                 if float(getstock) < price:
+#                     get=stock + '的價格：' + getstock
+#                     line_bot_api.push_message(yourid, TextSendMessage(text=get))
+#             else:
+#                 if float(getstock) > price:
+#                     get=stock + '的價格：' + getstock
+#                     line_bot_api.push_message(yourid, TextSendMessage(text=get))
+#         else:
+#             line_bot_api.push_message(yourid, TextSendMessage(text='這個有問題'))
+# second_5_j = schedule.every(10).seconds.do(job)
+
+# # 無窮迴圈
+# while True: 
+#     schedule.run_pending()
+#     time.sleep(1)
     
 #主程式
 import os
