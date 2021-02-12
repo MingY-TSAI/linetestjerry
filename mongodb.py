@@ -5,14 +5,6 @@ import datetime
 from flask import Flask
 from flask_pymongo import pymongo
 from app import app
-###############################################################################
-#                       股票機器人 Python基礎教學 【pymongo教學】                      #
-###############################################################################
-
-# Authentication Database認證資料庫
-Authdb='stockdb'
-
-
 
 
 
