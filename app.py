@@ -68,7 +68,7 @@ def handle_message(event):
                         "price": float(price),
                         "date_info": datetime.datetime.utcnow()
                        })
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
+        line_bot_api.push_message(uid,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
@@ -79,7 +79,7 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     else:
-        line_bot_api.push_message(event.reply_token,TextSendMessage(usespeak+'輸入錯誤'))
+        line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
     
     
