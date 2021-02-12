@@ -14,7 +14,7 @@ import re
 from pymongo import MongoClient
 import urllib.parse
 import datetime
-from flask_pymongo import pymongo
+
 
 app = Flask(__name__)
 
