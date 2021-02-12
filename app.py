@@ -74,6 +74,7 @@ def handle_message(event):
                        })
         line_bot_api.push_message(uid,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
+    
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
@@ -82,16 +83,18 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-    elif re.match('查詢存股',usespeak) is not None:
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
-        cel=list(collect.find())
-        stock_str=''
-        for stock in cel:
-            stock_str+=x['stock']
-        line_bot_api.push_message(uid, TextSendMessage(stock_str)
-        return 0
+    
+#     elif re.match('查詢存股',usespeak) is not None:
+#         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+#         db = client['stockdb']    
+#         collect = db['mystock']
+#         cel=list(collect.find())
+#         stock_str=''
+#         for stock in cel:
+#             stock_str+=x['stock']
+#         line_bot_api.push_message(uid, TextSendMessage(stock_str)
+#         return 0
+                                  
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
