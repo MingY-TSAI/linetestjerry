@@ -83,7 +83,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-############################################查詢仍失敗##################################################
+
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
@@ -98,12 +98,7 @@ def handle_message(event):
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
-# def show_user_stock_fountion():  
-#     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-#     db = client['stockdb']    
-#     collect = db['mystock']
-#     cel=list(collect.find({"data": 'care_stock'}))
-#     return cel
+
 # def job():
 #     data = show_user_stock_fountion()
 #     for i in data:
