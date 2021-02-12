@@ -92,7 +92,7 @@ def handle_message(event):
         stock_str=''
         for stock in cel:
             stock_str+=stock['stock']
-        line_bot_api.reply_message(event.reply_token,stock_str)
+        line_bot_api.push_message(uid, TextSendMessage(stock_str))
         return 0
                                   
     else:
