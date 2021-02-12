@@ -49,12 +49,13 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-#     stock=usespeak[0:4] 
-#     bs=usespeak[4:5] 
-#     price=usespeak[5:]
-    client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+    stock=usespeak[0:4] 
+    bs=usespeak[4:5] 
+    price=usespeak[5:]
+#     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+    MongoClient("mongodb://Jerry:abcd1234@cluster0-shard-00-00.3gbxu.mongodb.net:27017,cluster0-shard-00-01.3gbxu.mongodb.net:27017,cluster0-shard-00-02.3gbxu.mongodb.net:27017/mystock?ssl=true&replicaSet=atlas-kk9rpf-shard-0&authSource=admin&retryWrites=true&w=majority")
 #         client = MongoClient("mongodb://127.0.0.1:10250/?ssl=true") #host uri
-    db.authenticate(name="Jerry",password='abcd1234')
+#     db.authenticate(name="Jerry",password='abcd1234')
     db = client.stockdb    #Select the database
     collect = db['mystock']
     collect.insert({"stock": stock,
