@@ -72,7 +72,7 @@ def handle_message(event):
         return 0
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
         collect = db['mystock']
         collect.remove({"stock": stock})            
