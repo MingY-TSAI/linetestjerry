@@ -66,9 +66,8 @@ def handle_message(event):
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
         price=usespeak[5:]
-        
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb-abcd1234']
+        client =  MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']
         collect = db['mystock']
         collect.insert({"stock": stock,
                         "data": 'care_stock',
@@ -82,8 +81,8 @@ def handle_message(event):
   
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.z7sx8.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb-abcd1234']    
+        client =  MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']    
         collect = db['mystock']
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
