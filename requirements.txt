@@ -1,0 +1,7 @@
+gunicorn
+Flask
+line-bot-sdk
+pymongo
+Flask-PyMongo
+urllib3
+yahoofinancials
