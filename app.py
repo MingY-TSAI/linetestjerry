@@ -79,7 +79,7 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     else:
-        line_bot_api.push_message(TextSendMessage(usespeak+'輸入錯誤'))
+        line_bot_api.push_message(event.reply_token,TextSendMessage(usespeak+'輸入錯誤'))
         return 0
     
     
