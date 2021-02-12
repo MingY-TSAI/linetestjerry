@@ -1,4 +1,4 @@
-##V8
+##V9成功部屬
 #載入LineBot所需要的套件
 from flask import Flask, request, abort
 
@@ -10,7 +10,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
  #載入LineBot所需要的套件
-import mongodb
+# import mongodb
 import re
 from pymongo import MongoClient
 import urllib.parse
@@ -56,17 +56,28 @@ def handle_message(event):
 #--------------------------------------------------------------
 #     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#抓取id測試回復  
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
-        mongodb.write_user_stock_fountion(stock=usespeak[0:4], bs=usespeak[4:5], price=usespeak[5:])
+        stock=usespeak[0:4] 
+        bs=usespeak[4:5] 
+        price=usespeak[5:]
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']
+        collect = db['mystock']
+        collect.insert({"stock": stock,
+                        "data": 'care_stock',
+                        "bs": bs,
+                        "price": float(price),
+                        "date_info": datetime.datetime.utcnow()
+                       })
         line_bot_api.reply_message(event.reply_token,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
-    
-    
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
-        mongodb.delete_user_stock_fountion(stock=usespeak[2:])          
+        stock=usespeak[2:]
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']    
+        collect = db['mystock']
+        collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-    
-    
     else:
         line_bot_api.push_message(event.reply_token,TextSendMessage(usespeak+'輸入錯誤'))
         return 0
