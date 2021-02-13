@@ -89,39 +89,36 @@ def handle_message(event):
         db = client['stockdb']    
         collect = db['mystock']
         cel=list(collect.find())
-        for i in data:
+        for i in cel:
             stock=i['stock']
             bs=i['bs']
             price=i['price']
             
-        url = 'https://tw.stock.yahoo.com/q/ts?s=' + stock 
-        list_req = requests.get(url)
-        soup = BeautifulSoup(list_req.content, "html.parser")
-        table = soup.find_all('tbody')[2]
-        sp = table.select('tr')[1].select('td')[13].text
-        getstock = table.select('tr')[1].select('td')[12].text
-        print(sp,getstock)
-        price = 1.0
-        bs = '>'     
-        
-        if sp[0] == '△':
-            if float(sp[1:]) > price:              
-                line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n超過設定價格提醒!!'.format(stock,getstock,sp))
-                
+            url = 'https://tw.stock.yahoo.com/q/ts?s=' + stock 
+            list_req = requests.get(url)
+            soup = BeautifulSoup(list_req.content, "html.parser")
+            table = soup.find_all('tbody')[2]
+            sp = table.select('tr')[1].select('td')[13].text
+            getstock = table.select('tr')[1].select('td')[12].text
+
+
+            if sp[0] == '△':
+                if float(sp[1:]) > price:              
+                    line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n超過設定價格提醒!!'.format(stock,getstock,sp)))
+
+                else:
+                    line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n未超過設定價格!!'.format(stock,getstock,sp)))
+
+            elif sp[0] == '▽':
+                if float(sp[1:]) < price:
+                    line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n低於設定價格提醒!!'.format(stock,getstock,sp)))
+                    
+                else:
+                    line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n未低於設定價格提醒!!'.format(stock,getstock,sp)))
+
             else:
-                line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n未超過設定價格!!'.format(stock,getstock,sp))
-                                          
-        elif sp[0] == '▽':
-            if float(sp[1:]) < price:
-#                 line_bot_api.push_message(yourid, TextSendMessage(text=''))
-                print(stock,":",sp,'\n低於設定價格提醒!!')
-            else:
-                print(stock,":",sp,'\n未低於設定價格')
-#                 line_bot_api.push_message(yourid, TextSendMessage(text=''))
-            
-        else:
-            if float(sp[1:]) > price:
-                line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+                if float(sp[1:]) > price:
+                    line_bot_api.push_message(yourid, TextSendMessage('平盤'))
 
         
         return 0
