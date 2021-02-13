@@ -122,7 +122,7 @@ def handle_message(event):
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
  
         return 0
-#################################################
+#################################################test
     elif re.match('籌碼',usespeak) is not None::
         url = 'http://www.twse.com.tw/fund/BFI82U'
         list_req = requests.get(url)
@@ -137,8 +137,7 @@ def handle_message(event):
         ### 判斷是否為空值 ###
         if len(iilist) != 0: 
         ### 顯示結果 ###
-            content1 = '日期 ＝ ' + getjson['title']+'\n'+\
-            '三大法人合計買進 ＝ {0}\n三大法人合計賣出 ＝ {1}\n三大法人合計相差 ＝ {2}'.format(str(iilist[0]),str(iilist[1]),str(iilist[2]))
+            content1 = '日期 ＝ ' + getjson['title']+'\n'+\'三大法人合計買進 ＝ {0}\n三大法人合計賣出 ＝ {1}\n三大法人合計相差 ＝ {2}'.format(str(iilist[0]),str(iilist[1]),str(iilist[2]))
             line_bot_api.push_message(uid, TextSendMessage(content1))
 
         else:
