@@ -132,18 +132,17 @@ def handle_message(event):
         iilist=[]
         ### 判斷請求是否成功 ###
         if getjson['stat'] != '很抱歉，沒有符合條件的資料!': #如果抓不到資料會顯示這個
-        iilist=getjson['data'][4][1:] #直接取到三大法人最後加總的資料
+            iilist=getjson['data'][4][1:] #直接取到三大法人最後加總的資料
 
         ### 判斷是否為空值 ###
         if len(iilist) != 0: 
         ### 顯示結果 ###
-        line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
-        print('日期 ＝ ' + getjson['title'])
-        print('三大法人合計買進 ＝ ' + str(iilist[0]))
-        print('三大法人合計賣出 ＝ ' + str(iilist[1]))
-        print('三大法人合計相差 ＝ ' + str(iilist[2]))
+            content1 = '日期 ＝ ' + getjson['title']+'\n'+\
+            '三大法人合計買進 ＝ {0}\n三大法人合計賣出 ＝ {1}\n三大法人合計相差 ＝ {2}'.format(str(iilist[0]),str(iilist[1]),str(iilist[2]))
+            line_bot_api.push_message(uid, TextSendMessage(content1))
+
         else:
-        print('請求失敗，請檢查您的股票代號')
+            print('請求失敗，請檢查您的股票代號')
         
         return 0
 #################################################################    
