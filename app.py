@@ -89,44 +89,81 @@ def handle_message(event):
         db = client['stockdb']    
         collect = db['mystock']
         cel=list(collect.find())
-        stock_str=''
-        for stock in cel:
-            stock_str+=stock['stock']
-        line_bot_api.push_message(uid, TextSendMessage(stock_str))
+        for i in data:
+            stock=i['stock']
+            bs=i['bs']
+            price=i['price']
+            
+        url = 'https://tw.stock.yahoo.com/q/ts?s=' + stock 
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        table = soup.find_all('tbody')[2]
+        sp = table.select('tr')[1].select('td')[13].text
+        getstock = table.select('tr')[1].select('td')[12].text
+        print(sp,getstock)
+        price = 1.0
+        bs = '>'     
+        
+        if sp[0] == '△':
+            if float(sp[1:]) > price:              
+                line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n超過設定價格提醒!!'.format(stock,getstock,sp))
+                
+            else:
+                line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n未超過設定價格!!'.format(stock,getstock,sp))
+                                          
+        elif sp[0] == '▽':
+            if float(sp[1:]) < price:
+#                 line_bot_api.push_message(yourid, TextSendMessage(text=''))
+                print(stock,":",sp,'\n低於設定價格提醒!!')
+            else:
+                print(stock,":",sp,'\n未低於設定價格')
+#                 line_bot_api.push_message(yourid, TextSendMessage(text=''))
+            
+        else:
+            if float(sp[1:]) > price:
+                line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+
+        
         return 0
                                   
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
+############################################################################################
+# ##### 資料庫連接 #####
+# def constructor():
+#     #client = MongoClient('你的連接指令')
+#     CONNECTION_STRING = "mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority"
+#     client = pymongo.MongoClient(CONNECTION_STRING)
+#     db = client.get_database('flask_mongodb_atlas')
+#     return db
 
+# def show_user_stock_fountion():  
+#     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+#     db = client['stockdb']    
+#     collect = db['mystock']
+#     cel=list(collect.find())
+
+#     return cel
+############################################################################################
 # def job():
 #     data = show_user_stock_fountion()
-#     for i in data:
-#         stock=i['stock']
-#         bs=i['bs']
-#         price=i['price']
+
+
+
         
-#         url = 'https://tw.stock.yahoo.com/q/q?s=' + stock 
-#         list_req = requests.get(url)
-#         soup = BeautifulSoup(list_req.content, "html.parser")
-#         getstock= soup.find('b').text #裡面所有文字內容
-#         if float(getstock):
-#             if bs == '<':
-#                 if float(getstock) < price:
-#                     get=stock + '的價格：' + getstock
-#                     line_bot_api.push_message(yourid, TextSendMessage(text=get))
-#             else:
-#                 if float(getstock) > price:
-#                     get=stock + '的價格：' + getstock
-#                     line_bot_api.push_message(yourid, TextSendMessage(text=get))
-#         else:
-#             line_bot_api.push_message(yourid, TextSendMessage(text='這個有問題'))
+
+
+
 # second_5_j = schedule.every(10).seconds.do(job)
 
-# # 無窮迴圈
-# while True: 
+# 無窮迴圈
+# a=0
+# while a<2: 
 #     schedule.run_pending()
-#     time.sleep(1)
+#     a+=1
+#     time.sleep(2)
+    
     
 #主程式
 import os
