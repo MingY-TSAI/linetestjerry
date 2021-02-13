@@ -6,5 +6,4 @@ Flask-PyMongo
 urllib3
 yahoofinancials
 dnspython
-json
 pandas
