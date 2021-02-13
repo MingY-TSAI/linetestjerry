@@ -10,7 +10,6 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
- #載入LineBot所需要的套件
 # import mongodb
 import re
 from pymongo import MongoClient
@@ -18,16 +17,18 @@ import urllib.parse
 import datetime
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+import json
 
 
 app = Flask(__name__)
 
 
-# 必須放上自己的Channel Access Token
+# 自己的 Line Channel Access Token
 line_bot_api = LineBotApi('OC/2LXxWpqBrf+PiU4+ALXildS+3uZCvMbYnE7bfr3MvjNx4p9K7xGZwOQItMie9IFyCRHs79f7IXz2ffyLHK1fGgfTuM9IZn3KEuLCuL0Ovyx6k/HwAS9N1RxFi3GLiX5HUfM1K83aP/czfPW4zIAdB04t89/1O/w1cDnyilFU=')
-# 必須放上自己的Channel Secret
+# 自己的 Line Channel Secret
 handler = WebhookHandler('fd79a035b81250a8acaf1bc99c0f4269')
-
+#parameter1 Line uid
 line_bot_api.push_message('U5594160c067df9c2d9b4ceb12b0d90ad', TextSendMessage(text='你可以開始了'))
 
 # 監聽所有來自 /callback 的 Post Request
@@ -48,7 +49,7 @@ def callback():
 
     return 'OK'
 
-#訊息傳遞區塊
+###################################訊息傳遞區塊################################################
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -119,48 +120,37 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+ 
+        return 0
+#################################################
+    elif re.match('籌碼',usespeak) is not None::
+        url = 'http://www.twse.com.tw/fund/BFI82U'
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        getjson=json.loads(soup.text)
 
+        iilist=[]
+        ### 判斷請求是否成功 ###
+        if getjson['stat'] != '很抱歉，沒有符合條件的資料!': #如果抓不到資料會顯示這個
+        iilist=getjson['data'][4][1:] #直接取到三大法人最後加總的資料
+
+        ### 判斷是否為空值 ###
+        if len(iilist) != 0: 
+        ### 顯示結果 ###
+        line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
+        print('日期 ＝ ' + getjson['title'])
+        print('三大法人合計買進 ＝ ' + str(iilist[0]))
+        print('三大法人合計賣出 ＝ ' + str(iilist[1]))
+        print('三大法人合計相差 ＝ ' + str(iilist[2]))
+        else:
+        print('請求失敗，請檢查您的股票代號')
         
         return 0
-                                  
+#################################################################    
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
-############################################################################################
-# ##### 資料庫連接 #####
-# def constructor():
-#     #client = MongoClient('你的連接指令')
-#     CONNECTION_STRING = "mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority"
-#     client = pymongo.MongoClient(CONNECTION_STRING)
-#     db = client.get_database('flask_mongodb_atlas')
-#     return db
 
-# def show_user_stock_fountion():  
-#     client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-#     db = client['stockdb']    
-#     collect = db['mystock']
-#     cel=list(collect.find())
-
-#     return cel
-############################################################################################
-# def job():
-#     data = show_user_stock_fountion()
-
-
-
-        
-
-
-
-# second_5_j = schedule.every(10).seconds.do(job)
-
-# 無窮迴圈
-# a=0
-# while a<2: 
-#     schedule.run_pending()
-#     a+=1
-#     time.sleep(2)
-    
     
 #主程式
 import os
@@ -168,6 +158,4 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 
-# if __name__ == '__main__':
-#     app.run(debug=True)  
     
