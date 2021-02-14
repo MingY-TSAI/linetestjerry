@@ -2,7 +2,6 @@
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
-
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -121,7 +120,6 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
-############################################################################################################
 #######本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         print(yes.strftime("%Y%m%d"))
@@ -166,7 +164,7 @@ def handle_message(event):
         else:
             get='請求失敗，請檢查您的股票代號'
             line_bot_api.push_message(uid, TextSendMessage(text=get))
-####################################################################################################################
+
         return 0
 ############爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
