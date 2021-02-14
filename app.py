@@ -19,7 +19,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
-
+import time
+# import schedule
 
 app = Flask(__name__)
 
@@ -120,9 +121,54 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
- 
+############################################################################################################
+#######本月至昨日標準差分析
+        yes = datetime.datetime.now()- datetime.timedelta(days = 1)
+        print(yes.strftime("%Y%m%d"))
+        yes = '20210205'
+        url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo=2330'.format(yes)
+
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        getjson=json.loads(soup.text)
+        
+            # 判斷請求是否成功
+        if getjson['stat'] != '很抱歉，沒有符合條件的資料!':
+            stocklist = getjson['data']
+        else:
+            pass
+
+
+        if len(stocklist) != 0:
+       
+        #     把json資料丟進DataFrame
+            stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
+            stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
+            stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
+            # 看看這隻股票現在是否便宜（平均-兩倍標準差）
+
+            if pd.to_numeric(stockdf['收盤價'][-1:]).values[0] < stockAverage - (2*stockSTD):
+                buy = '這隻股票平均線大於兩倍標準差\n有機會進場！！'
+                # 顯示結果
+                get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
+                get=get+'\n中間價 ＝ ' + str(stockAverage)
+                get=get+'\n線距 ＝ ' + str(stockSTD)
+                buy=buy+'\n'+get
+                line_bot_api.push_message(uid, TextSendMessage(text=buy))
+            else:
+                buy = '未達兩倍標準差\n很貴不要買'
+                # 顯示結果
+                get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
+                get=get+'\n中間價 ＝ ' + str(stockAverage)
+                get=get+'\n線距 ＝ ' + str(stockSTD)
+                buy=buy+'\n'+get
+                line_bot_api.push_message(uid, TextSendMessage(text=buy))
+        else:
+            get='請求失敗，請檢查您的股票代號'
+            line_bot_api.push_message(uid, TextSendMessage(text=get))
+####################################################################################################################
         return 0
-# #################################################test
+############爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
         list_req = requests.get(url)
@@ -145,8 +191,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
 
-        
-# #################################################################    
+              
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
