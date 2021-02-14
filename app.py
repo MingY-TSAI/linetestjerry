@@ -123,7 +123,7 @@ def handle_message(event):
 #######本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         print(yes.strftime("%Y%m%d"))
-        yes = '20210205'
+        yes = '20210205'######################################################################################################################記得改
         url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo=2330'.format(yes)
 
         list_req = requests.get(url)
