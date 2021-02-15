@@ -219,11 +219,10 @@ def handle_message(event):
         for i in cel:
             stock=i['stock']
             stocknum.append(stock)
-
-        stocknumber = '2330'######################################################################################################################記得改
-         
-        for runn in stocknum:
-            stocknumber = i
+            
+#    stocknumber = '2330'######################################################################################################################記得改         
+        for stock in stocknum:
+            stocknumber = stock
             sumstock=[]
             stockdate=[]
             for i in range(11,0,-1):
@@ -242,7 +241,7 @@ def handle_message(event):
                 glucose_graph()
 
             image_url = glucose_graph()     
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
 #############################################################################################################   
 ##########################################################################################################################################           
