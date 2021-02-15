@@ -210,27 +210,38 @@ def handle_message(event):
             im = pyimgur.Imgur(CLIENT_ID)
             uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
             return uploaded_image.link
+        
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']    
+        collect = db['mystock']
+        cel=list(collect.find())
+        stocknum = []
+        for i in cel:
+            stock=i['stock']
+            stocknum.append(stock)
 
-        stocknumber='2330'
-        # https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20180801&stockNo=2330
-        sumstock=[]
-        stockdate=[]
-        for i in range(11,0,-1):
-            date = datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(days=i),'%Y%m%d') #先設定要爬的時間
-            r = requests.get('http://www.tse.com.tw/fund/T86?response=csv&date='+date+'&selectType=ALLBUT0999') #要爬的網站
-            if r.text != '\r\n': #有可能會沒有爬到東西，有可能是六日
-                get = pd.read_csv(StringIO(r.text), header=1).dropna(how='all', axis=1).dropna(how='any') # 把交易所的csv資料載下來
-                get=get[get['證券代號']==stocknumber] # 找到我們要搜尋的股票
-                if len(get) >0:
-                    get['三大法人買賣超股數'] = get['三大法人買賣超股數'].str.replace(',','').astype(float) # 去掉','這個符號把它轉成數字
-                    stockdate.append(date)
-                    sumstock.append(get['三大法人買賣超股數'].values[0])
+        stocknumber = '2330'######################################################################################################################記得改
+         
+        for runn in stocknum:
+            stocknumber = i
+            sumstock=[]
+            stockdate=[]
+            for i in range(11,0,-1):
+                date = datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(days=i),'%Y%m%d') #先設定要爬的時間
+                r = requests.get('http://www.tse.com.tw/fund/T86?response=csv&date='+date+'&selectType=ALLBUT0999') #要爬的網站
+                if r.text != '\r\n': #有可能會沒有爬到東西，有可能是六日
+                    get = pd.read_csv(StringIO(r.text), header=1).dropna(how='all', axis=1).dropna(how='any') # 把交易所的csv資料載下來
+                    get=get[get['證券代號']==stocknumber] # 找到我們要搜尋的股票
+                    if len(get) >0:
+                        get['三大法人買賣超股數'] = get['三大法人買賣超股數'].str.replace(',','').astype(float) # 去掉','這個符號把它轉成數字
+                        stockdate.append(date)
+                        sumstock.append(get['三大法人買賣超股數'].values[0])
 
-        if len(stockdate) >0:
-        ### 開始畫圖 ###
-            glucose_graph()
+            if len(stockdate) >0:
+            ### 開始畫圖 ###
+                glucose_graph()
 
-        image_url = glucose_graph()     
+            image_url = glucose_graph()     
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
 #############################################################################################################   
