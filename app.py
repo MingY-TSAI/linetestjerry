@@ -20,7 +20,7 @@ import pandas as pd
 import json
 import time
 import pyimgur
-from PIL import Image
+# from PIL import Image
 # import schedule
 
 app = Flask(__name__)
