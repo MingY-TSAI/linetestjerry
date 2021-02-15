@@ -1,4 +1,4 @@
-##V9成功部屬
+##V10成功部屬
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
@@ -22,6 +22,8 @@ import time
 import pyimgur
 from PIL import Image
 # import schedule
+import matplotlib.pyplot as plt
+import matplotlib.image as iming
 
 app = Flask(__name__)
 
