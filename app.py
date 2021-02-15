@@ -20,7 +20,7 @@ import pandas as pd
 import json
 import time
 import pyimgur
-# from PIL import Image
+from PIL import Image
 # import schedule
 
 app = Flask(__name__)
@@ -190,7 +190,57 @@ def handle_message(event):
         else:
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
-           
+##########################################################################################################################################
+#############################################################################################################
+# stocknumber='2330'
+# # https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20180801&stockNo=2330
+# sumstock=[]
+# stockdate=[]
+# for i in range(11,0,-1):
+#     date = datetime.datetime.strftime(datetime.datetime.now() - datetime.timedelta(days=i),'%Y%m%d') #先設定要爬的時間
+#     r = requests.get('http://www.tse.com.tw/fund/T86?response=csv&date='+date+'&selectType=ALLBUT0999') #要爬的網站
+#     if r.text != '\r\n': #有可能會沒有爬到東西，有可能是六日
+#         get = pd.read_csv(StringIO(r.text), header=1).dropna(how='all', axis=1).dropna(how='any') # 把交易所的csv資料載下來
+#         get=get[get['證券代號']==stocknumber] # 找到我們要搜尋的股票
+#         if len(get) >0:
+#             get['三大法人買賣超股數'] = get['三大法人買賣超股數'].str.replace(',','').astype(float) # 去掉','這個符號把它轉成數字
+#             stockdate.append(date)
+#             sumstock.append(get['三大法人買賣超股數'].values[0])
+# if len(stockdate) >0:
+#     ### 開始畫圖 ###
+#     plt.bar(stockdate, sumstock) 
+#     plt.xticks(fontsize=10,rotation=90)
+#     plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
+#     plt.title(stocknumber+'買賣超分析', fontsize=20,fontproperties="SimSun")
+#     plt.xlabel("Day", fontsize=15)
+#     plt.ylabel("Quantity", fontsize=15)
+#     plt.show()
+    
+# def glucose_graph():
+
+# plt.bar(stockdate, sumstock) 
+# plt.xticks(fontsize=10,rotation=90)
+# plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
+# plt.title('Institutional Investors', fontsize=20)
+# plt.xlabel("Day", fontsize=15)
+# plt.ylabel("Quantity", fontsize=15)
+# plt.savefig('send.png')
+
+
+# CLIENT_ID = "ce83df37b51aba3"
+# PATH = "send.png"
+# im = pyimgur.Imgur(CLIENT_ID)
+# uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
+# return uploaded_image.link
+# img_url = glucose_graph()
+# print(img_url)
+# line_bot_api = LineBotApi('OC/2LXxWpqBrf+PiU4+ALXildS+3uZCvMbYnE7bfr3MvjNx4p9K7xGZwOQItMie9IFyCRHs79f7IXz2ffyLHK1fGgfTuM9IZn3KEuLCuL0Ovyx6k/HwAS9N1RxFi3GLiX5HUfM1K83aP/czfPW4zIAdB04t89/1O/w1cDnyilFU=')
+# image_url = "https://i.imgur.com/1tiw7Gs.png"
+# uid = 'U5594160c067df9c2d9b4ceb12b0d90ad'
+
+# line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+#############################################################################################################   
+##########################################################################################################################################           
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
