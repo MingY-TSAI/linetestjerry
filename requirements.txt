@@ -9,3 +9,4 @@ dnspython
 pandas
 pyimgur
 Pillow
+matplotlib
