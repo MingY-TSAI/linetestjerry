@@ -195,19 +195,19 @@ def handle_message(event):
 ##########################################################################################################################################
 #############################################################################################################
     elif re.match('買賣',usespeak) is not None:
-        def glucose_graph():
-            plt.bar(stockdate, sumstock) 
-            plt.xticks(fontsize=10,rotation=90)
-            plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
-            plt.title(stocknumber+'買賣超分析', fontsize=20,fontproperties="SimSun")
-            plt.xlabel("Day", fontsize=15)
-            plt.ylabel("Quantity", fontsize=15)
-            plt.savefig('send.png')
-            CLIENT_ID = "ce83df37b51aba3"
-            PATH = "send.png"
-            im = pyimgur.Imgur(CLIENT_ID)
-            uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
-            return uploaded_image.link
+#         def glucose_graph():
+#             plt.bar(stockdate, sumstock) 
+#             plt.xticks(fontsize=10,rotation=90)
+#             plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
+#             plt.title(stocknumber+'買賣超分析', fontsize=20,fontproperties="SimSun")
+#             plt.xlabel("Day", fontsize=15)
+#             plt.ylabel("Quantity", fontsize=15)
+#             plt.savefig('send.png')
+#             CLIENT_ID = "ce83df37b51aba3"
+#             PATH = "send.png"
+#             im = pyimgur.Imgur(CLIENT_ID)
+#             uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
+#             return uploaded_image.link
         
         stocknumber='2330'
         # https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20180801&stockNo=2330
@@ -226,9 +226,19 @@ def handle_message(event):
             
         if len(stockdate) >0:
             ### 開始畫圖 ###
-            glucose_graph()
-        img_url = glucose_graph()
-        image_url = "https://i.imgur.com/1tiw7Gs.png"
+            plt.bar(stockdate, sumstock) 
+            plt.xticks(fontsize=10,rotation=90)
+            plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
+            plt.title(stocknumber+'買賣超分析', fontsize=20,fontproperties="SimSun")
+            plt.xlabel("Day", fontsize=15)
+            plt.ylabel("Quantity", fontsize=15)
+            plt.savefig('send.png')
+            CLIENT_ID = "ce83df37b51aba3"
+            PATH = "send.png"
+            im = pyimgur.Imgur(CLIENT_ID)
+            uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
+        
+        image_url = uploaded_image.link
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
 #############################################################################################################   
