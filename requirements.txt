@@ -8,3 +8,4 @@ yahoofinancials
 dnspython
 pandas
 pyimgur
+PIL
