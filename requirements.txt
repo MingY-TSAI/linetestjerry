@@ -1,5 +1,3 @@
-~ $ heroku buildpacks:add --index 1 heroku/python
-~ $ heroku buildpacks:add --index 2 numrut/ta-lib
 gunicorn
 Flask
 line-bot-sdk
