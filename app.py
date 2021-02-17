@@ -31,6 +31,7 @@ import yfinance as yf # yahoo專用的拿來拉股票資訊   ###########新套�
 import datetime
 import matplotlib.pyplot as plt # 繪圖專用   
 import mpl_finance as mpf # 專門用來畫蠟燭圖的  ###########新套件
+import talib
 
 app = Flask(__name__)
 
@@ -133,6 +134,7 @@ def handle_message(event):
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
             ############
+            ################以下請注意是否放回圈內
 #######本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         yes = yes.strftime("%Y%m%d")
@@ -179,8 +181,9 @@ def handle_message(event):
             
             
 ##################################################################################################################################################
-        def K_line():
-            fig = plt.figure(figsize=(24, 8))
+        #####K線圖
+        def K_line(): 
+            fig = plt.figure(figsize=(24, 14))
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xticks(range(0, len(stock.index), 5))
             ax.set_xticklabels(stock.index[::5])
@@ -199,7 +202,7 @@ def handle_message(event):
         
 
 
-        userstock='2331'
+        userstock = stock
         start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
         end = datetime.date.today()
 
@@ -211,26 +214,34 @@ def handle_message(event):
         stock = data.get_data_yahoo(userstock+'.TW', start, end)
         image_url = K_line()    
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-# #####################################8-1 股票K線圖
+        
+        def KD_plot(): 
+            ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
+            ret.columns=['K','D']
+            ret.index = stock['Close'].index
 
+            ### 開始畫圖 ###
+            ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
 
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            plt.title("KD") # 標題設定
+            plt.grid()
+            plt.savefig('kd.png')
+            CLIENT_ID = "ce83df37b51aba3"
+            PATH = "kd.png"
+            im = pyimgur.Imgur(CLIENT_ID)
+            uploaded_image = im.upload_image(PATH, title="upload pic")
+            return uploaded_image.link
+        
+        image_url = KD_plot()    
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        
 # 股票KD圖#################################################KD圖
 # ##8-2 Stochastic Oscillator KD指標圖
-# # '''
-# # KD指標 的主要假設：
-# # 股價有上漲趨勢時，當日收盤價會接近近期一段時間內最高價；
-# # 股價有下跌趨勢時，當日收盤價會接近近期一段時間內最低價。
 
-# ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
-# ret.columns=['K','D']
-# ret.index = stock['Close'].index
 
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
 
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("KD") # 標題設定
 
 # #8-3 移動平均成本
 # # 股票MA圖
