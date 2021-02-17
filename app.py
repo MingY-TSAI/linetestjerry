@@ -197,8 +197,7 @@ def handle_message(event):
             return uploaded_image.link
         
 
-        image_url = glucose_graph()     
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+
         userstock='2331'
         start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
         end = datetime.date.today()
@@ -209,7 +208,8 @@ def handle_message(event):
 
         # 取得股票資料
         stock = data.get_data_yahoo(userstock+'.TW', start, end)
-        K_line()
+        image_url = K_line()    
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 # #####################################8-1 股票K線圖
 
 
