@@ -190,10 +190,11 @@ def handle_message(event):
                                  alpha=0.6)
             plt.title("Candlestick_chart") # 標題設定
             plt.grid()
+            plt.savefig('kline.png')
             CLIENT_ID = "ce83df37b51aba3"
-            PATH = "send.png"
+            PATH = "kline.png"
             im = pyimgur.Imgur(CLIENT_ID)
-            uploaded_image = im.upload_image(PATH, title="pic")
+            uploaded_image = im.upload_image(PATH, title="upload pic")
             return uploaded_image.link
         
 
