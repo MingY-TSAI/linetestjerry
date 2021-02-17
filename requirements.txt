@@ -13,4 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
-heroku buildpacks:add --index 2 https://github.com/numrut/heroku-buildpack-python-talib
+$ heroku create --buildpack https://github.com/aneesh-neelam/heroku-buildpack-python-talib.git
