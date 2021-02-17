@@ -204,7 +204,7 @@ def handle_message(event):
 ##########################################################################################################################################
 
     
-    elif re.match('買賣',usespeak) is not None:
+    elif re.match('法人',usespeak) is not None:
         def glucose_graph():
             plt.bar(stockdate, sumstock) 
             plt.xticks(fontsize=10,rotation=90)
@@ -227,8 +227,7 @@ def handle_message(event):
         for i in cel:
             stock=i['stock']
             stocknum.append(stock)
-            
-#    stocknumber = '2330'######################################################################################################################記得改         
+                    
         for stock in stocknum:
             stocknumber = stock
             sumstock=[]
