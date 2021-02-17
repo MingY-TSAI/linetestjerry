@@ -13,3 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
+$ heroku config:add BUILDPACK_URL=https://github.com/aneesh-neelam/heroku-buildpack-python-talib.git
