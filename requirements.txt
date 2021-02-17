@@ -13,4 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
-heroku buildpacks numrut/ta-lib
+heroku buildpacks:add numrut/ta-lib
