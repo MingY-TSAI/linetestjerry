@@ -95,6 +95,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
+##-------------------------------------------------------------------------------------------------------------------------------------------------
 ###查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
@@ -112,7 +113,7 @@ def handle_message(event):
             table = soup.find_all('tbody')[2]
             sp = table.select('tr')[1].select('td')[13].text
             getstock = table.select('tr')[1].select('td')[12].text
-
+            ############發題醒
 
             if sp[0] == '△':
                 if float(sp[1:]) > price:              
@@ -131,11 +132,12 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+            ############
 #######本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         print(yes.strftime("%Y%m%d"))
         yes = '20210205'######################################################################################################################記得改
-        url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo=2330'.format(yes)
+        url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
 
         list_req = requests.get(url)
         soup = BeautifulSoup(list_req.content, "html.parser")
@@ -177,6 +179,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage(text=get))
 
         return 0
+##-------------------------------------------------------------------------------------------------------------------------------------------------
 ############爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
@@ -200,7 +203,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
 ##########################################################################################################################################
-#############################################################################################################
+
     
     elif re.match('買賣',usespeak) is not None:
         def glucose_graph():
@@ -249,7 +252,7 @@ def handle_message(event):
             image_url = glucose_graph()     
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
-#############################################################################################################   
+
 ##########################################################################################################################################           
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
@@ -350,26 +353,6 @@ ret.plot(color=['#5599FF'], linestyle='dashed')
 stock['Close'].plot(secondary_y=True,color='#FF0000')
 plt.title("On_Balance_Volume") # 標題設定
 
-####################8-6
-# 股票Williams圖
-ret = pd.DataFrame(talib.WILLR(stock['High'].values, stock['Low'].values, stock['Open'].values), columns= ['Williams'])
-ret = ret.set_index(stock['Close'].index.values)
-
-
-### 開始畫圖 ###
-ret.plot(color=['#5599FF'], linestyle='dashed')
-stock['Close'].plot(secondary_y=True,color='#FF0000')
-plt.title("Williams_Overbought") # 標題設定
-
-######################8-7 ADI股票趨勢
-# 股票ADI圖
-ret = pd.DataFrame(talib.ADX(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
-ret = ret.set_index(stock['Close'].index.values)
-
-### 開始畫圖 ###
-ret.plot(color=['#5599FF'], linestyle='dashed')
-stock['Close'].plot(secondary_y=True,color='#FF0000')
-plt.title("Average_Directional_Indicator") # 標題設定
 
 ##############################8-8真實趨勢
 # 股票ATR圖
