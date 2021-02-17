@@ -25,6 +25,12 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.image as iming
 from io import StringIO
+pd.core.common.is_list_like = pd.api.types.is_list_like
+from pandas_datareader import data   ###########新套件
+import yfinance as yf # yahoo專用的拿來拉股票資訊   ###########新套件
+import datetime
+import matplotlib.pyplot as plt # 繪圖專用   
+import mpl_finance as mpf # 專門用來畫蠟燭圖的  ###########新套件
 
 app = Flask(__name__)
 
