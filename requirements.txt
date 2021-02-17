@@ -1,3 +1,5 @@
+~ $ heroku buildpacks:add --index 1 heroku/python
+~ $ heroku buildpacks:add --index 2 numrut/ta-lib
 gunicorn
 Flask
 line-bot-sdk
@@ -13,4 +15,3 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
-heroku buildpacks:add numrut/ta-lib
