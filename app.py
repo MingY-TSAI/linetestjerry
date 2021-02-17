@@ -300,10 +300,10 @@ plt.grid()
 
 # 股票KD圖#################################################KD圖
 ##8-2 Stochastic Oscillator KD指標圖
-'''
-KD指標 的主要假設：
-股價有上漲趨勢時，當日收盤價會接近近期一段時間內最高價；
-股價有下跌趨勢時，當日收盤價會接近近期一段時間內最低價。
+# '''
+# KD指標 的主要假設：
+# 股價有上漲趨勢時，當日收盤價會接近近期一段時間內最高價；
+# 股價有下跌趨勢時，當日收盤價會接近近期一段時間內最低價。
 '''
 ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
 ret.columns=['K','D']
@@ -328,11 +328,11 @@ stock['Close'].plot(secondary_y=True,color='#FF0000')
 plt.title("Moving_Average") # 標題設定
 
 ##8-4 MACD
-'''
-應用兩條速度不同的平滑移動平均線(EMA)，計算兩者之間的差離狀態(DIF)，並且對差離值(DIF)做指數平滑移動平均，即為MACD線。
+# '''
+# 應用兩條速度不同的平滑移動平均線(EMA)，計算兩者之間的差離狀態(DIF)，並且對差離值(DIF)做指數平滑移動平均，即為MACD線。
 
-簡單來說MACD就是，長期與短期的移動平均線即將要收斂或發散的徵兆，是用來判斷買賣股票的時機與訊號。
-MACDsignal 為短期線 突破為買點
+# 簡單來說MACD就是，長期與短期的移動平均線即將要收斂或發散的徵兆，是用來判斷買賣股票的時機與訊號。
+# MACDsignal 為短期線 突破為買點
 '''
 ret=pd.DataFrame()
 ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
