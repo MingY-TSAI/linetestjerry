@@ -10,3 +10,6 @@ pandas
 pyimgur
 Pillow
 matplotlib
+mpl_finance
+yfinance
+pandas_datareader
