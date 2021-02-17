@@ -13,4 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
-https://github.com/aneesh-neelam/talib-binaries.git
+https://github.com/aneesh-neelam/talib-binaries
