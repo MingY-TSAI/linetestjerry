@@ -13,4 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
-https://github.com/heroku/heroku-buildpack-python
+https://github.com/aneesh-neelam/heroku-buildpack-python-talib.git
