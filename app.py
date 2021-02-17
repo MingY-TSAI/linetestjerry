@@ -254,8 +254,168 @@ def handle_message(event):
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
+'''
+##8   8-1,8-2,8-3 8-4 ,8-5 ,8-9,8-10,8-11
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jan 18 14:35:26 2019
 
-    
+@author: aaaaa
+"""
+
+import pandas as pd
+pd.core.common.is_list_like = pd.api.types.is_list_like
+from pandas_datareader import data   ###########新套件
+import yfinance as yf # yahoo專用的拿來拉股票資訊   ###########新套件
+import datetime
+import matplotlib.pyplot as plt # 繪圖專用   
+import mpl_finance as mpf # 專門用來畫蠟燭圖的  ###########新套件
+
+userstock='2331'
+start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
+end = datetime.date.today()
+
+# 與yahoo請求
+pd.core.common.is_list_like = pd.api.types.is_list_like
+yf.pdr_override()
+
+# 取得股票資料
+stock = data.get_data_yahoo(userstock+'.TW', start, end)
+
+#####################################8-1 股票K線圖
+fig = plt.figure(figsize=(24, 8))
+ax = fig.add_subplot(1, 1, 1)
+ax.set_xticks(range(0, len(stock.index), 5))
+ax.set_xticklabels(stock.index[::5])
+plt.xticks(fontsize=10,rotation=90)
+mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'], stock['Low'],
+                     width=0.5, colorup='r', colordown='green',
+                     alpha=0.6)
+plt.title("Candlestick_chart") # 標題設定
+plt.grid()
+# plt.savefig('Candlestick_chart.png') #存檔
+
+# 股票KD圖#################################################KD圖
+##8-2 Stochastic Oscillator KD指標圖
+'''
+KD指標 的主要假設：
+股價有上漲趨勢時，當日收盤價會接近近期一段時間內最高價；
+股價有下跌趨勢時，當日收盤價會接近近期一段時間內最低價。
+'''
+ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
+ret.columns=['K','D']
+ret.index = stock['Close'].index
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
+
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("KD") # 標題設定
+
+#8-3 移動平均成本
+# 股票MA圖
+ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
+ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
+ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Moving_Average") # 標題設定
+
+##8-4 MACD
+'''
+應用兩條速度不同的平滑移動平均線(EMA)，計算兩者之間的差離狀態(DIF)，並且對差離值(DIF)做指數平滑移動平均，即為MACD線。
+
+簡單來說MACD就是，長期與短期的移動平均線即將要收斂或發散的徵兆，是用來判斷買賣股票的時機與訊號。
+MACDsignal 為短期線 突破為買點
+'''
+ret=pd.DataFrame()
+ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Moving Average Convergence / Divergence") # 標題設定
+
+#8-5量分析
+# 股票OBV圖
+ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("On_Balance_Volume") # 標題設定
+
+####################8-6
+# 股票Williams圖
+ret = pd.DataFrame(talib.WILLR(stock['High'].values, stock['Low'].values, stock['Open'].values), columns= ['Williams'])
+ret = ret.set_index(stock['Close'].index.values)
+
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Williams_Overbought") # 標題設定
+
+######################8-7 ADI股票趨勢
+# 股票ADI圖
+ret = pd.DataFrame(talib.ADX(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Average_Directional_Indicator") # 標題設定
+
+##############################8-8真實趨勢
+# 股票ATR圖
+ret = pd.DataFrame(talib.ATR(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Average_True_Range") # 標題設定
+
+##########################8-9相對強度
+# 股票RSI圖
+ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Relative_Strength_Index") # 標題設定
+
+###############################################8-10資金流動
+# 股票MFI圖
+ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Money_Flow_Index") # 標題設定
+
+##############################8-11
+# 股票ROC圖
+ret = pd.DataFrame(talib.ROC(stock['Close'].values, timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
+ret = ret.set_index(stock['Close'].index.values)
+
+### 開始畫圖 ###
+ret.plot(color=['#5599FF'], linestyle='dashed')
+stock['Close'].plot(secondary_y=True,color='#FF0000')
+plt.title("Receiver_Operating_Characteristic_Curve") # 標題設定
+
+plt.show()
+
+# plt. close() # 殺掉記憶體中的圖片
+
+'''    
 #主程式
 import os
 if __name__ == "__main__":
