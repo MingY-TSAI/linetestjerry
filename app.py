@@ -92,7 +92,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-# 查詢股票提醒價格
+    # 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
@@ -148,7 +148,7 @@ def handle_message(event):
 
         if len(stocklist) != 0:
        
-        # 把json資料丟進DataFrame
+            # 把json資料丟進DataFrame
             stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
             stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
             stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
@@ -209,7 +209,7 @@ def handle_message(event):
             ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("KD",'kd.png')  
-#-----------------------------------------------------------------------------------------------------------------------------------------------------test        
+        
         #移動平均成本
         # 股票MA圖        
         def moving_avg():
