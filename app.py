@@ -205,7 +205,7 @@ def handle_message(event):
                                  alpha=0.6)
             return make_plot("Candlestick_chart",'kline.png') 
 
-# 股票KD圖#################################################KD圖 
+        # 股票KD圖
         def KD_plot(): 
             ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
             ret.columns=['K','D']
@@ -213,27 +213,67 @@ def handle_message(event):
             ### 開始畫圖 ###
             ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
             stock['Close'].plot(secondary_y=True,color='#FF0000')
-            return make_plot("KD",'kd.png')      
-#移動平均成本
-# # 股票MA圖        
-#         def moving_avg():
-#             ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
-#             ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
-#             ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
-#             ret = ret.set_index(stock['Close'].index.values)
+            return make_plot("KD",'kd.png')  
+#-----------------------------------------------------------------------------------------------------------------------------------------------------test        
+        #移動平均成本
+        # 股票MA圖        
+        def moving_avg():
+            ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
+            ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
+            ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Moving_Average",'mavg.png')
+        
+        # ##MACD
+        def MACD():
+            ret=pd.DataFrame()
+            ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Moving Average Convergence / Divergence",'macd.png')        
+        
+        #量分析# 股票OBV圖
+        def vol():       
+            ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("On_Balance_Volume",'vol.png')
+        
+        # 股票ATR圖
+        def ATR(): 
+            ret = pd.DataFrame(talib.ATR(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Average_True_Range",'atr.png')
 
-#             ### 開始畫圖 ###
-#             ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
-#             stock['Close'].plot(secondary_y=True,color='#FF0000')
-#             plt.title("Moving_Average") # 標題設定        
-#             plt.title("Moving AVG") # 標題設定
-#             plt.grid()
-#             plt.savefig('mavg.png')
-#             CLIENT_ID = "ce83df37b51aba3"
-#             PATH = "mavg.png"
-#             im = pyimgur.Imgur(CLIENT_ID)
-#             uploaded_image = im.upload_image(PATH, title="upload pic")
-#             return uploaded_image.link
+        #股票RSI圖    
+        def RST():
+            ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Relative_Strength_Index",'rst.png')
+        
+        #資金流動,股票MFI圖
+        def MFI():
+            ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Money_Flow_Index",'mfi.png')
+        
+        # 股票ROC圖
+        def ROC():
+            ret = pd.DataFrame(talib.ROC(stock['Close'].values, timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Receiver_Operating_Characteristic_Curve",'roc.png')
 
         userstock = stock
         start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
@@ -250,85 +290,28 @@ def handle_message(event):
 
         image_url = KD_plot()    
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
         
+        image_url = moving_avg()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = MACD()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = vol()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = ATR()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = RST()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = MFI()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
+        image_url = ROC()
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
-# ##8-4 MACD
-# # 
-# # 應用兩條速度不同的平滑移動平均線(EMA)，計算兩者之間的差離狀態(DIF)，並且對差離值(DIF)做指數平滑移動平均，即為MACD線。
-
-# # 簡單來說MACD就是，長期與短期的移動平均線即將要收斂或發散的徵兆，是用來判斷買賣股票的時機與訊號。
-# # MACDsignal 為短期線 突破為買點
-
-# ret=pd.DataFrame()
-# ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Moving Average Convergence / Divergence") # 標題設定
-
-# #8-5量分析
-# # 股票OBV圖
-# ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("On_Balance_Volume") # 標題設定
-
-
-# ##############################8-8真實趨勢
-# # 股票ATR圖
-# ret = pd.DataFrame(talib.ATR(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Average_True_Range") # 標題設定
-
-# ##########################8-9相對強度
-# # 股票RSI圖
-# ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Relative_Strength_Index") # 標題設定
-
-# ###############################################8-10資金流動
-# # 股票MFI圖
-# ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Money_Flow_Index") # 標題設定
-
-# ##############################8-11
-# # 股票ROC圖
-# ret = pd.DataFrame(talib.ROC(stock['Close'].values, timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
-# ret = ret.set_index(stock['Close'].index.values)
-
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Receiver_Operating_Characteristic_Curve") # 標題設定
-
-# plt.show()
-
-# plt. close() # 殺掉記憶體中的圖片
 
 ##################################################################################################################################################
         return 0
