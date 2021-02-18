@@ -181,6 +181,18 @@ def handle_message(event):
             
             
 ##################################################################################################################################################
+        ###畫圖格式
+        def make_plot(titlename, savename ):
+            plt.title(titlename) # 標題設定
+            plt.grid()
+            plt.savefig(savename)
+            CLIENT_ID = "ce83df37b51aba3"
+            PATH = savename
+            im = pyimgur.Imgur(CLIENT_ID)
+            uploaded_image = im.upload_image(PATH, title="upload pic")
+            return uploaded_image.link
+            
+        
         #####K線圖
         def K_line(): 
             fig = plt.figure(figsize=(24, 14))
@@ -191,16 +203,37 @@ def handle_message(event):
             mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'], stock['Low'],
                                  width=0.5, colorup='r', colordown='green',
                                  alpha=0.6)
-            plt.title("Candlestick_chart") # 標題設定
-            plt.grid()
-            plt.savefig('kline.png')
-            CLIENT_ID = "ce83df37b51aba3"
-            PATH = "kline.png"
-            im = pyimgur.Imgur(CLIENT_ID)
-            uploaded_image = im.upload_image(PATH, title="upload pic")
-            return uploaded_image.link
-        
+            return make_plot("Candlestick_chart",'kline.png') 
 
+# 股票KD圖#################################################KD圖 
+        def KD_plot(): 
+            ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
+            ret.columns=['K','D']
+            ret.index = stock['Close'].index
+            ### 開始畫圖 ###
+            ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("KD",'kd.png')      
+#移動平均成本
+# # 股票MA圖        
+#         def moving_avg():
+#             ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
+#             ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
+#             ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
+#             ret = ret.set_index(stock['Close'].index.values)
+
+#             ### 開始畫圖 ###
+#             ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+#             stock['Close'].plot(secondary_y=True,color='#FF0000')
+#             plt.title("Moving_Average") # 標題設定        
+#             plt.title("Moving AVG") # 標題設定
+#             plt.grid()
+#             plt.savefig('mavg.png')
+#             CLIENT_ID = "ce83df37b51aba3"
+#             PATH = "mavg.png"
+#             im = pyimgur.Imgur(CLIENT_ID)
+#             uploaded_image = im.upload_image(PATH, title="upload pic")
+#             return uploaded_image.link
 
         userstock = stock
         start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
@@ -214,46 +247,17 @@ def handle_message(event):
         stock = data.get_data_yahoo(userstock+'.TW', start, end)
         image_url = K_line()    
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-# 股票KD圖#################################################KD圖        
-        def KD_plot(): 
-            ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
-            ret.columns=['K','D']
-            ret.index = stock['Close'].index
 
-            ### 開始畫圖 ###
-            ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
-
-            stock['Close'].plot(secondary_y=True,color='#FF0000')
-            plt.title("KD") # 標題設定
-            plt.grid()
-            plt.savefig('kd.png')
-            CLIENT_ID = "ce83df37b51aba3"
-            PATH = "kd.png"
-            im = pyimgur.Imgur(CLIENT_ID)
-            uploaded_image = im.upload_image(PATH, title="upload pic")
-            return uploaded_image.link
-        
         image_url = KD_plot()    
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
         
-# 股票KD圖#################################################KD圖
-# ##8-2 Stochastic Oscillator KD指標圖
 
 
 
 
-# #8-3 移動平均成本
-# # 股票MA圖
-# ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
-# ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
-# ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
-# ret = ret.set_index(stock['Close'].index.values)
 
-# ### 開始畫圖 ###
-# ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
-# stock['Close'].plot(secondary_y=True,color='#FF0000')
-# plt.title("Moving_Average") # 標題設定
+
 
 # ##8-4 MACD
 # # 
