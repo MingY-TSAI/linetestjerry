@@ -215,26 +215,26 @@ def handle_message(event):
         image_url = K_line()    
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         
-        def KD_plot(): 
-            ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
-            ret.columns=['K','D']
-            ret.index = stock['Close'].index
+#         def KD_plot(): 
+#             ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
+#             ret.columns=['K','D']
+#             ret.index = stock['Close'].index
 
-            ### 開始畫圖 ###
-            ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
+#             ### 開始畫圖 ###
+#             ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
 
-            stock['Close'].plot(secondary_y=True,color='#FF0000')
-            plt.title("KD") # 標題設定
-            plt.grid()
-            plt.savefig('kd.png')
-            CLIENT_ID = "ce83df37b51aba3"
-            PATH = "kd.png"
-            im = pyimgur.Imgur(CLIENT_ID)
-            uploaded_image = im.upload_image(PATH, title="upload pic")
-            return uploaded_image.link
+#             stock['Close'].plot(secondary_y=True,color='#FF0000')
+#             plt.title("KD") # 標題設定
+#             plt.grid()
+#             plt.savefig('kd.png')
+#             CLIENT_ID = "ce83df37b51aba3"
+#             PATH = "kd.png"
+#             im = pyimgur.Imgur(CLIENT_ID)
+#             uploaded_image = im.upload_image(PATH, title="upload pic")
+#             return uploaded_image.link
         
-        image_url = KD_plot()    
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+#         image_url = KD_plot()    
+#         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
 
         
 # 股票KD圖#################################################KD圖
