@@ -26,11 +26,11 @@ import matplotlib.pyplot as plt
 import matplotlib.image as iming
 from io import StringIO
 pd.core.common.is_list_like = pd.api.types.is_list_like
-from pandas_datareader import data   ###########新套件
-import yfinance as yf # yahoo專用的拿來拉股票資訊   ###########新套件
+from pandas_datareader import data  
+import yfinance as yf # yahoo專用的拿來拉股票資訊   
 import datetime
 import matplotlib.pyplot as plt # 繪圖專用   
-import mpl_finance as mpf # 專門用來畫蠟燭圖的  ###########新套件
+import mpl_finance as mpf # 專門用來畫蠟燭圖的
 import talib
 
 app = Flask(__name__)
@@ -67,11 +67,7 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-##------------------鏡像回復------------------------------------
-#     message = TextSendMessage(text=event.message.text)
-#     line_bot_api.reply_message(event.reply_token,message)
-#--------------------------------------------------------------
-#     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#抓取id測試回復  
+ 
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
@@ -96,8 +92,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-##-------------------------------------------------------------------------------------------------------------------------------------------------
-###查詢股票提醒價格
+# 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
@@ -114,7 +109,7 @@ def handle_message(event):
             table = soup.find_all('tbody')[2]
             sp = table.select('tr')[1].select('td')[13].text
             getstock = table.select('tr')[1].select('td')[12].text
-            ############發題醒
+            # 發題醒
 
             if sp[0] == '△':
                 if float(sp[1:]) > price:              
@@ -133,9 +128,9 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
-            ############
+
             ################以下請注意是否放回圈內
-#######本月至昨日標準差分析
+        # 本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         yes = yes.strftime("%Y%m%d")
         url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
@@ -153,7 +148,7 @@ def handle_message(event):
 
         if len(stocklist) != 0:
        
-        #     把json資料丟進DataFrame
+        # 把json資料丟進DataFrame
             stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
             stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
             stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
@@ -180,7 +175,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage(text=get))
             
             
-##################################################################################################################################################
+        # 各種分析圖
         # 畫圖格式
         def make_plot(titlename, savename ):
             plt.title(titlename) # 標題設定
@@ -299,11 +294,9 @@ def handle_message(event):
         for url in listurl:
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
-
-##################################################################################################################################################
         return 0
-##-------------------------------------------------------------------------------------------------------------------------------------------------
-############爬籌碼 三大法人最後加總的資料
+
+# 爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
         list_req = requests.get(url)
@@ -325,8 +318,6 @@ def handle_message(event):
         else:
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
-##########################################################################################################################################
-
     
     elif re.match('法人',usespeak) is not None:
         def glucose_graph():
@@ -368,14 +359,12 @@ def handle_message(event):
                         sumstock.append(get['三大法人買賣超股數'].values[0])
 
             if len(stockdate) >0:
-            ### 開始畫圖 ###
                 glucose_graph()
 
             image_url = glucose_graph()     
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
-
-##########################################################################################################################################           
+       
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
