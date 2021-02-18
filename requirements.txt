@@ -13,3 +13,4 @@ matplotlib
 mpl_finance
 yfinance
 pandas_datareader
+TA-Lib
