@@ -31,7 +31,7 @@ import yfinance as yf # yahoo專用的拿來拉股票資訊   ###########新套�
 import datetime
 import matplotlib.pyplot as plt # 繪圖專用   
 import mpl_finance as mpf # 專門用來畫蠟燭圖的  ###########新套件
-# import talib
+import talib
 
 app = Flask(__name__)
 
