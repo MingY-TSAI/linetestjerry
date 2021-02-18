@@ -181,7 +181,7 @@ def handle_message(event):
             
             
 ##################################################################################################################################################
-        ###畫圖格式
+        # 畫圖格式
         def make_plot(titlename, savename ):
             plt.title(titlename) # 標題設定
             plt.grid()
@@ -193,7 +193,7 @@ def handle_message(event):
             return uploaded_image.link
             
         
-        #####K線圖
+        # K線圖
         def K_line(): 
             fig = plt.figure(figsize=(24, 14))
             ax = fig.add_subplot(1, 1, 1)
@@ -226,7 +226,7 @@ def handle_message(event):
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("Moving_Average",'mavg.png')
         
-        # ##MACD
+        # MACD
         def MACD():
             ret=pd.DataFrame()
             ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
@@ -235,7 +235,7 @@ def handle_message(event):
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("Moving Average Convergence / Divergence",'macd.png')        
         
-        #量分析# 股票OBV圖
+        # 量分析# 股票OBV圖
         def vol():       
             ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
             ret = ret.set_index(stock['Close'].index.values)
@@ -251,7 +251,7 @@ def handle_message(event):
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("Average_True_Range",'atr.png')
 
-        #股票RSI圖    
+        # 股票RSI圖    
         def RST():
             ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
             ret = ret.set_index(stock['Close'].index.values)
@@ -259,7 +259,7 @@ def handle_message(event):
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("Relative_Strength_Index",'rst.png')
         
-        #資金流動,股票MFI圖
+        # 資金流動,股票MFI圖
         def MFI():
             ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
             ret = ret.set_index(stock['Close'].index.values)
@@ -285,32 +285,19 @@ def handle_message(event):
 
         # 取得股票資料
         stock = data.get_data_yahoo(userstock+'.TW', start, end)
-        image_url = K_line()    
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = KD_plot()    
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-        
-        image_url = moving_avg()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = MACD()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = vol()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = ATR()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = RST()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = MFI()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
-
-        image_url = ROC()
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+        # 劃出所有分析圖
+        image_url1 = K_line()    
+        image_url2 = KD_plot()    
+        image_url3 = moving_avg()
+        image_url4 = MACD()
+        image_url5 = vol()
+        image_url6 = ATR()
+        image_url7 = RST()
+        image_url8 = MFI()
+        image_url9 = ROC()
+        listurl = [image_url1, image_url2, image_url3, image_url4, image_url5, image_url6, image_url7, image_url8, image_url9]
+        for url in listurl:
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
 
 ##################################################################################################################################################
