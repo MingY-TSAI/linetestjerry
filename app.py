@@ -1,5 +1,4 @@
-#V11成功部屬
-
+#V12成功部屬
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
@@ -28,10 +27,10 @@ import matplotlib.image as iming
 from io import StringIO
 pd.core.common.is_list_like = pd.api.types.is_list_like
 from pandas_datareader import data  
-import yfinance as yf 
+import yfinance as yf # yahoo專用的拿來拉股票資訊   
 import datetime
-import matplotlib.pyplot as plt   
-import mpl_finance as mpf 
+import matplotlib.pyplot as plt # 繪圖專用   
+import mpl_finance as mpf # 專門用來畫蠟燭圖的
 import talib
 
 app = Flask(__name__)
@@ -68,23 +67,18 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-        def mongodb():
+    def mongodb():
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
         collect = db['mystock']
         return collect
     
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
-        stock=usespeak[0:4] 
-        bs=usespeak[4:5] 
-        price=usespeak[5:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']
-        collect = db['mystock']
-        collect.insert({"stock": stock,
+        collect = mongodb()
+        collect.insert({"stock": usespeak[0:4],
                         "data": 'care_stock',
-                        "bs": bs,
-                        "price": float(price),
+                        "bs": usespeak[4:5],
+                        "price": float(usespeak[5:]),
                         "date_info": datetime.datetime.utcnow()
                        })
         line_bot_api.push_message(uid,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
@@ -92,17 +86,14 @@ def handle_message(event):
     
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
+    
 # 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         cel=list(collect.find())
         for i in cel:
             stock=i['stock']
@@ -133,7 +124,7 @@ def handle_message(event):
 
             else:
                 if float(sp[1:]) > price:
-                    line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+                    line_bot_api.push_message(uid, TextSendMessage('平盤'))
             ############
             ################以下請注意是否放回圈內
 #######本月至昨日標準差分析
@@ -215,7 +206,7 @@ def handle_message(event):
             ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("KD",'kd.png')  
-#-----------------------------------------------------------------------------------------------------------------------------------------------------test        
+       
         #移動平均成本
         # 股票MA圖        
         def moving_avg():
@@ -301,9 +292,8 @@ def handle_message(event):
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
 
-##################################################################################################################################################
         return 0
-##-------------------------------------------------------------------------------------------------------------------------------------------------
+
 ############爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
@@ -326,7 +316,6 @@ def handle_message(event):
         else:
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
-##########################################################################################################################################
 
     
     elif re.match('法人',usespeak) is not None:
@@ -344,9 +333,7 @@ def handle_message(event):
             uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
             return uploaded_image.link
         
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         cel=list(collect.find())
         stocknum = []
         for i in cel:
@@ -370,13 +357,14 @@ def handle_message(event):
 
             if len(stockdate) >0:
             ### 開始畫圖 ###
-                bar_graph()
-
-            bar_url = bar_graph()     
+                bar_graph() 
+            bar_url = bar_graph()    
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=bar_url, preview_image_url=bar_url))
+            
         return 0
 
-##########################################################################################################################################           
+    
+    
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
