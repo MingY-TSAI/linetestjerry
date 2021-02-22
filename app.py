@@ -1,4 +1,5 @@
-##V11成功部屬
+#V11成功部屬
+##V10成功部屬
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
@@ -32,7 +33,6 @@ import datetime
 import matplotlib.pyplot as plt # 繪圖專用   
 import mpl_finance as mpf # 專門用來畫蠟燭圖的
 import talib
-
 
 app = Flask(__name__)
 
@@ -68,7 +68,11 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
- 
+##------------------鏡像回復------------------------------------
+#     message = TextSendMessage(text=event.message.text)
+#     line_bot_api.reply_message(event.reply_token,message)
+#--------------------------------------------------------------
+#     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#抓取id測試回復  
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
@@ -93,7 +97,7 @@ def handle_message(event):
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
-    # 查詢股票提醒價格
+# 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
@@ -110,7 +114,7 @@ def handle_message(event):
             table = soup.find_all('tbody')[2]
             sp = table.select('tr')[1].select('td')[13].text
             getstock = table.select('tr')[1].select('td')[12].text
-            # 發題醒
+            ############發題醒
 
             if sp[0] == '△':
                 if float(sp[1:]) > price:              
@@ -129,9 +133,9 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(yourid, TextSendMessage('平盤'))
-
+            ############
             ################以下請注意是否放回圈內
-        # 本月至昨日標準差分析
+#######本月至昨日標準差分析
         yes = datetime.datetime.now()- datetime.timedelta(days = 1)
         yes = yes.strftime("%Y%m%d")
         url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
@@ -149,7 +153,7 @@ def handle_message(event):
 
         if len(stocklist) != 0:
        
-            # 把json資料丟進DataFrame
+        #     把json資料丟進DataFrame
             stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
             stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
             stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
@@ -176,7 +180,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage(text=get))
             
             
-        # 各種分析圖
+##################################################################################################################################################
         # 畫圖格式
         def make_plot(titlename, savename ):
             plt.title(titlename) # 標題設定
@@ -210,7 +214,7 @@ def handle_message(event):
             ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
             stock['Close'].plot(secondary_y=True,color='#FF0000')
             return make_plot("KD",'kd.png')  
-        
+#-----------------------------------------------------------------------------------------------------------------------------------------------------test        
         #移動平均成本
         # 股票MA圖        
         def moving_avg():
@@ -295,9 +299,11 @@ def handle_message(event):
         for url in listurl:
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
-        return 0
 
-# 爬籌碼 三大法人最後加總的資料
+##################################################################################################################################################
+        return 0
+##-------------------------------------------------------------------------------------------------------------------------------------------------
+############爬籌碼 三大法人最後加總的資料
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
         list_req = requests.get(url)
@@ -319,6 +325,8 @@ def handle_message(event):
         else:
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
+##########################################################################################################################################
+
     
     elif re.match('法人',usespeak) is not None:
         def glucose_graph():
@@ -360,44 +368,14 @@ def handle_message(event):
                         sumstock.append(get['三大法人買賣超股數'].values[0])
 
             if len(stockdate) >0:
+            ### 開始畫圖 ###
                 glucose_graph()
 
             image_url = glucose_graph()     
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
-    
-#     elif re.match('買啥',usespeak) is not None:
-#         elected='' # 最後可以買的股票放這裡
-#         ########## 當短期5日線突破20日線 ##########
-#         url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100205&PickCount=1700&f=j'
-#         list_req = requests.get(url)
-#         soup = BeautifulSoup(list_req.content, "html.parser")
-#         getjson1=json.loads(soup.text)
 
-#         ########## 股本大於20億 ##########
-#         url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100538,100539,100540,100541&PickCount=1700&f=j&366'
-#         list_req = requests.get(url)
-#         soup = BeautifulSoup(list_req.content, "html.parser")
-#         getjson2=json.loads(soup.text)
-
-#         for i in getjson1['items']:
-#             if i['symid'] in str(getjson2['items']):
-#         ########## 週均量大於 1000 張 ##########   
-#                 url = 'https://tw.stock.yahoo.com/q/q?s=' + i['symid']
-#                 getjson3=pd.read_html(url,encoding='big5',header=0)
-
-#                 if getjson3[2]['張數'].values[0] >1000 :
-#                     elected = elected + i['symid'] +'\t' +i['symname']+'\t' +str(getjson3[2]['成交'].values[0])+'\n'
-
-#         ########## 秀出結果 ##########            
-#         if elected != '':# 判斷是不是空直
-#             line_bot_api.push_message(uid, TextSendMessage(elected))
-#             return 0
-
-#         else:
-#             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
-#             return 0
-       
+##########################################################################################################################################           
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
         return 0
