@@ -128,7 +128,7 @@ def handle_message(event):
 
             else:
                 if float(sp[1:]) > price:
-                    line_bot_api.push_message(yourid, TextSendMessage('平盤'))
+                    line_bot_api.push_message(uid, TextSendMessage('平盤'))
             ############
             ################以下請注意是否放回圈內
 #######本月至昨日標準差分析
@@ -394,7 +394,7 @@ def handle_message(event):
 
         ########## 秀出結果 ##########            
         if elected != '':# 判斷是不是空直
-            line_bot_api.push_message(uid, TextSendMessage(elected))
+            line_bot_api.push_message(uid, TextSendMessage(text = elected))
 
         else:
             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
