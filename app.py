@@ -319,7 +319,7 @@ def handle_message(event):
 
     
     elif re.match('法人',usespeak) is not None:
-        def glucose_graph():
+        def bar_graph():
             plt.bar(stockdate, sumstock) 
             plt.xticks(fontsize=10,rotation=90)
             plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
@@ -357,8 +357,8 @@ def handle_message(event):
 
             if len(stockdate) >0:
             ### 開始畫圖 ###
-            image_url = glucose_graph()     
-            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+            bar_url = bar_graph()    
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=bar_url, preview_image_url=bar_url))
         return 0
 
     
