@@ -67,18 +67,18 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-
-    if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
-        stock=usespeak[0:4] 
-        bs=usespeak[4:5] 
-        price=usespeak[5:]
+    def mongodb():
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']
+        db = client['stockdb']    
         collect = db['mystock']
-        collect.insert({"stock": stock,
+        return collect
+    
+    if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
+        collect = mongodb()
+        collect.insert({"stock": usespeak[0:4],
                         "data": 'care_stock',
-                        "bs": bs,
-                        "price": float(price),
+                        "bs": usespeak[4:5],
+                        "price": float(usespeak[5:]),
                         "date_info": datetime.datetime.utcnow()
                        })
         line_bot_api.push_message(uid,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
@@ -86,18 +86,14 @@ def handle_message(event):
     
     elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
         stock=usespeak[2:]
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     
 # 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         cel=list(collect.find())
         for i in cel:
             stock=i['stock']
@@ -337,9 +333,7 @@ def handle_message(event):
             uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
             return uploaded_image.link
         
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
-        db = client['stockdb']    
-        collect = db['mystock']
+        collect = mongodb()
         cel=list(collect.find())
         stocknum = []
         for i in cel:
@@ -369,40 +363,6 @@ def handle_message(event):
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
 
-    elif re.match('買啥',usespeak) is not None:
-        
-        elected='' # 最後可以買的股票放這裡
-        ########## 當短期5日線突破20日線 ##########
-        url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100205&PickCount=1700&f=j'
-        list_req = requests.get(url)
-        soup = BeautifulSoup(list_req.content, "html.parser")
-        getjson1=json.loads(soup.text)
-
-        ########## 股本大於20億 ##########
-        url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100538,100539,100540,100541&PickCount=1700&f=j&366'
-        list_req = requests.get(url)
-        soup = BeautifulSoup(list_req.content, "html.parser")
-        getjson2=json.loads(soup.text)
-
-        for i in getjson1['items']:
-            if i['symid'] in str(getjson2['items']):
-        ########## 週均量大於 1000 張 ##########   
-                url = 'https://tw.stock.yahoo.com/q/q?s=' + i['symid']
-                getjson3=pd.read_html(url,encoding='big5',header=0)
-
-                if getjson3[2]['張數'].values[0] >1000 :
-                    elected = elected + i['symid'] +'\t' +i['symname']+'\t' +str(getjson3[2]['成交'].values[0])+'\n'
-                    
-        line_bot_api.push_message(uid, TextSendMessage(elected))
-#         ########## 秀出結果 ##########            
-#         if elected != '':# 判斷是不是空直
-#             line_bot_api.push_message(uid, TextSendMessage(elected))
-
-#         else:
-#             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
-
-            
-        return 0
     
     
     else:
