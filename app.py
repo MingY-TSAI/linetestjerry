@@ -125,169 +125,169 @@ def handle_message(event):
                     line_bot_api.push_message(uid, TextSendMessage('平盤'))
             ############
 
-    #######本月至昨日標準差分析
-            yes = datetime.datetime.now()- datetime.timedelta(days = 1)
-            yes = yes.strftime("%Y%m%d")
-            url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
+#######本月至昨日標準差分析
+        yes = datetime.datetime.now()- datetime.timedelta(days = 1)
+        yes = yes.strftime("%Y%m%d")
+        url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
 
-            list_req = requests.get(url)
-            soup = BeautifulSoup(list_req.content, "html.parser")
-            getjson=json.loads(soup.text)
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        getjson=json.loads(soup.text)
 
-                # 判斷請求是否成功
-            if getjson['stat'] != '很抱歉，沒有符合條件的資料!':
-                stocklist = getjson['data']
+            # 判斷請求是否成功
+        if getjson['stat'] != '很抱歉，沒有符合條件的資料!':
+            stocklist = getjson['data']
+        else:
+            pass
+
+
+        if len(stocklist) != 0:
+
+        #     把json資料丟進DataFrame
+            stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
+            stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
+            stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
+            # 看看這隻股票現在是否便宜（平均-兩倍標準差）
+
+            if pd.to_numeric(stockdf['收盤價'][-1:]).values[0] < stockAverage - (2*stockSTD):
+                buy = '這隻股票平均線大於兩倍標準差\n有機會進場！！'
+                # 顯示結果
+                get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
+                get=get+'\n中間價 ＝ ' + str(stockAverage)
+                get=get+'\n線距 ＝ ' + str(stockSTD)
+                buy=buy+'\n'+get
+                line_bot_api.push_message(uid, TextSendMessage(text=buy))
             else:
-                pass
+                buy = '未達兩倍標準差\n很貴不要買'
+                # 顯示結果
+                get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
+                get=get+'\n中間價 ＝ ' + str(stockAverage)
+                get=get+'\n線距 ＝ ' + str(stockSTD)
+                buy=buy+'\n'+get
+                line_bot_api.push_message(uid, TextSendMessage(text=buy))
+        else:
+            get='請求失敗，請檢查您的股票代號'
+            line_bot_api.push_message(uid, TextSendMessage(text=get))
 
 
-            if len(stocklist) != 0:
-
-            #     把json資料丟進DataFrame
-                stockdf = pd.DataFrame(stocklist[0:],columns=["日期","成交股數","成交金額","開盤價","最高價","最低價","收盤價","漲跌價差","成交筆數"])
-                stockAverage = pd.to_numeric(stockdf['收盤價']).mean() #計算平均數
-                stockSTD = pd.to_numeric(stockdf['收盤價']).std() #計算標準差
-                # 看看這隻股票現在是否便宜（平均-兩倍標準差）
-
-                if pd.to_numeric(stockdf['收盤價'][-1:]).values[0] < stockAverage - (2*stockSTD):
-                    buy = '這隻股票平均線大於兩倍標準差\n有機會進場！！'
-                    # 顯示結果
-                    get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
-                    get=get+'\n中間價 ＝ ' + str(stockAverage)
-                    get=get+'\n線距 ＝ ' + str(stockSTD)
-                    buy=buy+'\n'+get
-                    line_bot_api.push_message(uid, TextSendMessage(text=buy))
-                else:
-                    buy = '未達兩倍標準差\n很貴不要買'
-                    # 顯示結果
-                    get='收盤價 ＝ ' + stockdf['收盤價'][-1:].values[0]
-                    get=get+'\n中間價 ＝ ' + str(stockAverage)
-                    get=get+'\n線距 ＝ ' + str(stockSTD)
-                    buy=buy+'\n'+get
-                    line_bot_api.push_message(uid, TextSendMessage(text=buy))
-            else:
-                get='請求失敗，請檢查您的股票代號'
-                line_bot_api.push_message(uid, TextSendMessage(text=get))
+##################################################################################################################################################
+        # 畫圖格式
+        def make_plot(titlename, savename ):
+            plt.title(titlename) # 標題設定
+            plt.grid()
+            plt.savefig(savename)
+            CLIENT_ID = "ce83df37b51aba3"
+            PATH = savename
+            im = pyimgur.Imgur(CLIENT_ID)
+            uploaded_image = im.upload_image(PATH, title="upload pic")
+            return uploaded_image.link
 
 
-    ##################################################################################################################################################
-            # 畫圖格式
-            def make_plot(titlename, savename ):
-                plt.title(titlename) # 標題設定
-                plt.grid()
-                plt.savefig(savename)
-                CLIENT_ID = "ce83df37b51aba3"
-                PATH = savename
-                im = pyimgur.Imgur(CLIENT_ID)
-                uploaded_image = im.upload_image(PATH, title="upload pic")
-                return uploaded_image.link
+        # K線圖
+        def K_line(): 
+            fig = plt.figure(figsize=(24, 14))
+            ax = fig.add_subplot(1, 1, 1)
+            ax.set_xticks(range(0, len(stock.index), 5))
+            ax.set_xticklabels(stock.index[::5])
+            plt.xticks(fontsize=10,rotation=90)
+            mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'], stock['Low'],
+                                 width=0.5, colorup='r', colordown='green',
+                                 alpha=0.6)
+            return make_plot("Candlestick_chart",'kline.png') 
 
+        # 股票KD圖
+        def KD_plot(): 
+            ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
+            ret.columns=['K','D']
+            ret.index = stock['Close'].index
+            ### 開始畫圖 ###
+            ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("KD",'kd.png')  
 
-            # K線圖
-            def K_line(): 
-                fig = plt.figure(figsize=(24, 14))
-                ax = fig.add_subplot(1, 1, 1)
-                ax.set_xticks(range(0, len(stock.index), 5))
-                ax.set_xticklabels(stock.index[::5])
-                plt.xticks(fontsize=10,rotation=90)
-                mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'], stock['Low'],
-                                     width=0.5, colorup='r', colordown='green',
-                                     alpha=0.6)
-                return make_plot("Candlestick_chart",'kline.png') 
+        #移動平均成本
+        # 股票MA圖        
+        def moving_avg():
+            ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
+            ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
+            ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Moving_Average",'mavg.png')
 
-            # 股票KD圖
-            def KD_plot(): 
-                ret = pd.DataFrame(list(talib.STOCH(stock['High'].values, stock['Low'].values, stock['Close'].values))).transpose()
-                ret.columns=['K','D']
-                ret.index = stock['Close'].index
-                ### 開始畫圖 ###
-                ret.plot(color=['#5599FF','#66FF66'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("KD",'kd.png')  
+        # MACD
+        def MACD():
+            ret=pd.DataFrame()
+            ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Moving Average Convergence / Divergence",'macd.png')        
 
-            #移動平均成本
-            # 股票MA圖        
-            def moving_avg():
-                ret = pd.DataFrame(talib.SMA(stock['Close'].values,10), columns= ['10-day average']) #10日移動平均線
-                ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,20), columns= ['20-day average'])], axis=1) #10日移動平均線
-                ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'].values,60), columns= ['60-day average'])], axis=1) #10日移動平均線
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Moving_Average",'mavg.png')
+        # 量分析# 股票OBV圖
+        def vol():       
+            ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("On_Balance_Volume",'vol.png')
 
-            # MACD
-            def MACD():
-                ret=pd.DataFrame()
-                ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'].values,fastperiod=6, slowperiod=12, signalperiod=9)
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF','#66FF66','#FFBB66'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Moving Average Convergence / Divergence",'macd.png')        
+        # 股票ATR圖
+        def ATR(): 
+            ret = pd.DataFrame(talib.ATR(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Average_True_Range",'atr.png')
 
-            # 量分析# 股票OBV圖
-            def vol():       
-                ret = pd.DataFrame(talib.OBV(stock['Close'].values, stock['Volume'].values.astype(float)), columns= ['OBV'])
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("On_Balance_Volume",'vol.png')
+        # 股票RSI圖    
+        def RST():
+            ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Relative_Strength_Index",'rst.png')
 
-            # 股票ATR圖
-            def ATR(): 
-                ret = pd.DataFrame(talib.ATR(stock['High'].values, stock['Low'].values, stock['Close'].values), columns= ['Average True Range'])
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Average_True_Range",'atr.png')
+        # 資金流動,股票MFI圖
+        def MFI():
+            ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Money_Flow_Index",'mfi.png')
 
-            # 股票RSI圖    
-            def RST():
-                ret = pd.DataFrame(talib.RSI(stock['Close'].values,24), columns= ['Relative Strength Index'])
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Relative_Strength_Index",'rst.png')
+        # 股票ROC圖
+        def ROC():
+            ret = pd.DataFrame(talib.ROC(stock['Close'].values, timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
+            ret = ret.set_index(stock['Close'].index.values)
+            ret.plot(color=['#5599FF'], linestyle='dashed')
+            stock['Close'].plot(secondary_y=True,color='#FF0000')
+            return make_plot("Receiver_Operating_Characteristic_Curve",'roc.png')
 
-            # 資金流動,股票MFI圖
-            def MFI():
-                ret = pd.DataFrame(talib.MFI(stock['High'].values,stock['Low'].values,stock['Close'].values,stock['Volume'].values.astype(float), timeperiod=14), columns= ['Money Flow Index'])
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Money_Flow_Index",'mfi.png')
+        userstock = stock
+        start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
+        end = datetime.date.today()
 
-            # 股票ROC圖
-            def ROC():
-                ret = pd.DataFrame(talib.ROC(stock['Close'].values, timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
-                ret = ret.set_index(stock['Close'].index.values)
-                ret.plot(color=['#5599FF'], linestyle='dashed')
-                stock['Close'].plot(secondary_y=True,color='#FF0000')
-                return make_plot("Receiver_Operating_Characteristic_Curve",'roc.png')
+        # 與yahoo請求
+        pd.core.common.is_list_like = pd.api.types.is_list_like
+        yf.pdr_override()
 
-            userstock = stock
-            start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
-            end = datetime.date.today()
-
-            # 與yahoo請求
-            pd.core.common.is_list_like = pd.api.types.is_list_like
-            yf.pdr_override()
-
-            # 取得股票資料
-            stock = data.get_data_yahoo(userstock+'.TW', start, end)
-            # 劃出所有分析圖
-            image_url1 = K_line()    
-            image_url2 = KD_plot()    
-            image_url3 = moving_avg()
-            image_url4 = MACD()
-            image_url5 = vol()
-            image_url6 = ATR()
-            image_url7 = RST()
-            image_url8 = MFI()
-            image_url9 = ROC()
-            listurl = [image_url1, image_url2, image_url3, image_url4, image_url5, image_url6, image_url7, image_url8, image_url9]
-            for url in listurl:
-                line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
+        # 取得股票資料
+        stock = data.get_data_yahoo(userstock+'.TW', start, end)
+        # 劃出所有分析圖
+        image_url1 = K_line()    
+        image_url2 = KD_plot()    
+        image_url3 = moving_avg()
+        image_url4 = MACD()
+        image_url5 = vol()
+        image_url6 = ATR()
+        image_url7 = RST()
+        image_url8 = MFI()
+        image_url9 = ROC()
+        listurl = [image_url1, image_url2, image_url3, image_url4, image_url5, image_url6, image_url7, image_url8, image_url9]
+        for url in listurl:
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
 
         return 0
