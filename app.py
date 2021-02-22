@@ -392,9 +392,11 @@ def handle_message(event):
         ########## 秀出結果 ##########            
         if elected != '':# 判斷是不是空直
             line_bot_api.push_message(uid, TextSendMessage(elected))
+            return 0
 
         else:
             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
+            return 0
        
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
