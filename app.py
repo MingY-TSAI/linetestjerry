@@ -387,7 +387,7 @@ def handle_message(event):
                 getjson3=pd.read_html(url,encoding='big5',header=0)
 
                 if getjson3[2]['張數'].values[0] >1000 :
-                    elected = elected + i['symid'] +'\t' +i['symname']+ '\n'
+                    elected = elected + i['symid'] +'\t' +i['symname']+'\t' +str(getjson3[2]['成交'].values[0])+'\n'
 
         ########## 秀出結果 ##########            
         if elected != '':# 判斷是不是空直
