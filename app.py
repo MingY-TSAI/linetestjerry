@@ -1,5 +1,5 @@
 #V11成功部屬
-##V10成功部屬
+
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
@@ -28,10 +28,10 @@ import matplotlib.image as iming
 from io import StringIO
 pd.core.common.is_list_like = pd.api.types.is_list_like
 from pandas_datareader import data  
-import yfinance as yf # yahoo專用的拿來拉股票資訊   
+import yfinance as yf 
 import datetime
-import matplotlib.pyplot as plt # 繪圖專用   
-import mpl_finance as mpf # 專門用來畫蠟燭圖的
+import matplotlib.pyplot as plt   
+import mpl_finance as mpf 
 import talib
 
 app = Flask(__name__)
@@ -68,16 +68,12 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
-##------------------鏡像回復------------------------------------
-#     message = TextSendMessage(text=event.message.text)
-#     line_bot_api.reply_message(event.reply_token,message)
-#--------------------------------------------------------------
-#     line_bot_api.reply_message(event.reply_token,TextSendMessage(str(uid)+usespeak))#抓取id測試回復 
         def mongodb():
         client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
         db = client['stockdb']    
         collect = db['mystock']
         return collect
+    
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
         stock=usespeak[0:4] 
         bs=usespeak[4:5] 
@@ -334,7 +330,7 @@ def handle_message(event):
 
     
     elif re.match('法人',usespeak) is not None:
-        def glucose_graph():
+        def bar_graph():
             plt.bar(stockdate, sumstock) 
             plt.xticks(fontsize=10,rotation=90)
             plt.axhline(0, color='c', linewidth=1) # 繪製0的那條線
@@ -374,10 +370,10 @@ def handle_message(event):
 
             if len(stockdate) >0:
             ### 開始畫圖 ###
-                glucose_graph()
+                bar_graph()
 
-            image_url = glucose_graph()     
-            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
+            bar_url = bar_graph()     
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=bar_url, preview_image_url=bar_url))
         return 0
 
 ##########################################################################################################################################           
