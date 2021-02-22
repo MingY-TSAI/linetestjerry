@@ -1,4 +1,4 @@
-##V10成功部屬
+##V11成功部屬
 #載入LineBot所需要的套件
 from __future__ import print_function
 from flask import Flask, request, abort
@@ -32,6 +32,7 @@ import datetime
 import matplotlib.pyplot as plt # 繪圖專用   
 import mpl_finance as mpf # 專門用來畫蠟燭圖的
 import talib
+
 
 app = Flask(__name__)
 
@@ -364,6 +365,36 @@ def handle_message(event):
             image_url = glucose_graph()     
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
+    
+    elif re.match('買啥',usespeak) is not None:
+        elected='' # 最後可以買的股票放這裡
+        ########## 當短期5日線突破20日線 ##########
+        url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100205&PickCount=1700&f=j'
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        getjson1=json.loads(soup.text)
+
+        ########## 股本大於20億 ##########
+        url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100538,100539,100540,100541&PickCount=1700&f=j&366'
+        list_req = requests.get(url)
+        soup = BeautifulSoup(list_req.content, "html.parser")
+        getjson2=json.loads(soup.text)
+
+        for i in getjson1['items']:
+            if i['symid'] in str(getjson2['items']):
+        ########## 週均量大於 1000 張 ##########   
+                url = 'https://tw.stock.yahoo.com/q/q?s=' + i['symid']
+                getjson3=pd.read_html(url,encoding='big5',header=0)
+
+                if getjson3[2]['張數'].values[0] >1000 :
+                    elected = elected + i['symid'] +'\t' +i['symname']+ '\n'
+
+        ########## 秀出結果 ##########            
+        if elected != '':# 判斷是不是空直
+            line_bot_api.push_message(uid, TextSendMessage(elected))
+
+        else:
+            line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
        
     else:
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'輸入錯誤'))
