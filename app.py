@@ -386,10 +386,10 @@ def handle_message(event):
 
         ########## 秀出結果 ##########            
         if elected != '':# 判斷是不是空直
-        line_bot_api.push_message('U5594160c067df9c2d9b4ceb12b0d90ad', TextSendMessage(elected))
+            line_bot_api.push_message('U5594160c067df9c2d9b4ceb12b0d90ad', TextSendMessage(elected))
 
         else:
-        line_bot_api.push_message('U5594160c067df9c2d9b4ceb12b0d90ad', TextSendMessage('沒有股票可以買'))
+            line_bot_api.push_message('U5594160c067df9c2d9b4ceb12b0d90ad', TextSendMessage('沒有股票可以買'))
         return 0
     
     else:
