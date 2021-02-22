@@ -333,7 +333,9 @@ def handle_message(event):
             uploaded_image = im.upload_image(PATH, title="Uploaded with PyImgur")
             return uploaded_image.link
         
-        collect = mongodb()
+        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        db = client['stockdb']    
+        collect = db['mystock']
         cel=list(collect.find())
         stocknum = []
         for i in cel:
