@@ -66,7 +66,7 @@ def handle_message(event):
     uid = profile.user_id #使用者ID
     usespeak=str(event.message.text) #使用者講的話
     def mongodb():
-        client = MongoClient("mongodb+srv://Jerry:abcd1234@cluster0.3gbxu.mongodb.net/stockdb?retryWrites=true&w=majority")
+        client = MongoClient("@@@")
         db = client['stockdb']    
         collect = db['mystock']
         return collect
