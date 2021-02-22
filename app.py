@@ -392,13 +392,14 @@ def handle_message(event):
 
                 if getjson3[2]['張數'].values[0] >1000 :
                     elected = elected + i['symid'] +'\t' +i['symname']+'\t' +str(getjson3[2]['成交'].values[0])+'\n'
+                    
+        line_bot_api.push_message(uid, TextSendMessage(elected))
+#         ########## 秀出結果 ##########            
+#         if elected != '':# 判斷是不是空直
+#             line_bot_api.push_message(uid, TextSendMessage(elected))
 
-        ########## 秀出結果 ##########            
-        if elected != '':# 判斷是不是空直
-            line_bot_api.push_message(uid, TextSendMessage(elected))
-
-        else:
-            line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
+#         else:
+#             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
 
             
         return 0
