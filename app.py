@@ -357,8 +357,6 @@ def handle_message(event):
 
             if len(stockdate) >0:
             ### 開始畫圖 ###
-                glucose_graph()
-
             image_url = glucose_graph()     
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=image_url, preview_image_url=image_url))
         return 0
