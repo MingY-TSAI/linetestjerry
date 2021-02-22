@@ -9,7 +9,6 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
-# import mongodb
 import re
 from pymongo import MongoClient
 import urllib.parse
@@ -21,16 +20,15 @@ import json
 import time
 import pyimgur
 from PIL import Image
-# import schedule
 import matplotlib.pyplot as plt
 import matplotlib.image as iming
 from io import StringIO
 pd.core.common.is_list_like = pd.api.types.is_list_like
 from pandas_datareader import data  
-import yfinance as yf # yahoo專用的拿來拉股票資訊   
+import yfinance as yf  
 import datetime
-import matplotlib.pyplot as plt # 繪圖專用   
-import mpl_finance as mpf # 專門用來畫蠟燭圖的
+import matplotlib.pyplot as plt   
+import mpl_finance as mpf 
 import talib
 
 app = Flask(__name__)
