@@ -357,8 +357,8 @@ def handle_message(event):
 
             if len(stockdate) >0:
             ### 開始畫圖 ###
-            bar_url = bar_graph()    
-            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=bar_url, preview_image_url=bar_url))
+                bar_url = bar_graph()    
+                line_bot_api.push_message(uid, ImageSendMessage(original_content_url=bar_url, preview_image_url=bar_url))
             
         return 0
 
