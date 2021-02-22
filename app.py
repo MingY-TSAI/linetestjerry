@@ -59,7 +59,7 @@ def callback():
 
     return 'OK'
 
-###################################訊息傳遞區塊################################################
+#----------------------------------------------------------------訊息傳遞區塊----------------------------------------------------------------#
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -71,6 +71,7 @@ def handle_message(event):
         collect = db['mystock']
         return collect
     
+    # 存要關注的股票
     if re.match('[0-9]{4}[<>][0-9]',usespeak) is not None:
         collect = mongodb()
         collect.insert({"stock": usespeak[0:4],
@@ -82,14 +83,15 @@ def handle_message(event):
         line_bot_api.push_message(uid,TextSendMessage(usespeak[0:4]+'已經儲存成功'))
         return 0
     
-    elif re.match('刪除[0-9]{4}',usespeak) is not None: # 刪除存在資料庫裡面的股票
+    # 刪除存在資料庫裡面的股票
+    elif re.match('刪除[0-9]{4}',usespeak) is not None: 
         stock=usespeak[2:]
         collect = mongodb()
         collect.remove({"stock": stock})            
         line_bot_api.push_message(uid, TextSendMessage(usespeak+'已經刪除成功'))
         return 0
     
-# 查詢股票提醒價格
+    # 查詢股票提醒價格
     elif re.match('查詢',usespeak) is not None:
         collect = mongodb()
         cel=list(collect.find())
@@ -104,8 +106,7 @@ def handle_message(event):
             table = soup.find_all('tbody')[2]
             sp = table.select('tr')[1].select('td')[13].text
             getstock = table.select('tr')[1].select('td')[12].text
-            ############發題醒
-
+            #---------------------------------------------------------------發題醒--------------------------------------------------------------#           
             if sp[0] == '△':
                 if float(sp[1:]) > price:              
                     line_bot_api.push_message(uid, TextSendMessage('股票代號{0}:{1}元:{2}元\n超過設定價格提醒!!'.format(stock,getstock,sp)))
@@ -123,9 +124,9 @@ def handle_message(event):
             else:
                 if float(sp[1:]) > price:
                     line_bot_api.push_message(uid, TextSendMessage('平盤'))
-            ############
+            #-----------------------------------------------------------------------------------------------------------------------------------#
 
-    #######本月至昨日標準差分析
+            #-----------------------------------------------------------本月至昨日標準差分析-----------------------------------------------------------#
             yes = datetime.datetime.now()- datetime.timedelta(days = 1)
             yes = yes.strftime("%Y%m%d")
             url='https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={0}&stockNo={1}'.format(yes,stock)
@@ -168,9 +169,9 @@ def handle_message(event):
             else:
                 get='請求失敗，請檢查您的股票代號'
                 line_bot_api.push_message(uid, TextSendMessage(text=get))
+            #----------------------------------------------------------------------------------------------------------------------------------------#
 
-
-    ##################################################################################################################################################
+         #-----------------------------------------------------------------畫圖分析-----------------------------------------------------------------#       
             # 畫圖格式
             def make_plot(titlename, savename ):
                 plt.title(titlename) # 標題設定
@@ -290,9 +291,10 @@ def handle_message(event):
                 line_bot_api.push_message(uid, ImageSendMessage(original_content_url=url, preview_image_url=url))
 
 
+         #-----------------------------------------------------------------------------------------------------------------------------------------# 
         return 0
 
-############爬籌碼 三大法人最後加總的資料
+#----------------------爬籌碼 三大法人最後加總的資料----------------------#
     elif re.match('籌碼',usespeak) is not None:
         url = 'http://www.twse.com.tw/fund/BFI82U'
         list_req = requests.get(url)
@@ -314,8 +316,7 @@ def handle_message(event):
         else:
             line_bot_api.push_message(uid, TextSendMessage('請求失敗，請檢查您的股票代號'))
             return 0
-
-    
+#----------------------------------------------------------------------#  
     elif re.match('法人',usespeak) is not None:
         def bar_graph():
             plt.bar(stockdate, sumstock) 
@@ -368,7 +369,7 @@ def handle_message(event):
         return 0
 
 
-
+#-------------------------------------------------------------------------------------------------------------------------------------------#
     
 #主程式
 import os
