@@ -370,6 +370,7 @@ def handle_message(event):
         return 0
 
     elif re.match('買啥',usespeak) is not None:
+        
         elected='' # 最後可以買的股票放這裡
         ########## 當短期5日線突破20日線 ##########
         url = 'https://tw.screener.finance.yahoo.net/screener/ws?PickID=100205&PickCount=1700&f=j'
@@ -394,10 +395,11 @@ def handle_message(event):
 
         ########## 秀出結果 ##########            
         if elected != '':# 判斷是不是空直
-            line_bot_api.push_message(uid, TextSendMessage(text = elected))
+            line_bot_api.push_message(uid, TextSendMessage(elected))
 
         else:
             line_bot_api.push_message(uid, TextSendMessage('沒有股票可以買'))
+
             
         return 0
     
